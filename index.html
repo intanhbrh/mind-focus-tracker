@@ -1,686 +1,1607 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Intan Nur Habriah – Internship Portfolio</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FocusFlow">
+<meta name="theme-color" content="#080810">
+<meta name="description" content="FocusFlow — Your daily mind & focus tracker. Track energy, mood, focus sessions, sleep and get AI coaching.">
+<title>FocusFlow — Daily Mind Tracker</title>
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ── PASTE YOUR FIREBASE CONFIG HERE ──
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  // Expose to window for non-module scripts
+  window._auth = auth;
+  window._db = db;
+  window._provider = provider;
+  window._signInWithPopup = signInWithPopup;
+  window._signOut = signOut;
+  window._onAuthStateChanged = onAuthStateChanged;
+  window._doc = doc;
+  window._setDoc = setDoc;
+  window._getDoc = getDoc;
+  window._updateDoc = updateDoc;
+  window._arrayUnion = arrayUnion;
+  window._serverTimestamp = serverTimestamp;
+  window._firebaseReady = true;
+  window.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --bg2: #111118;
-    --bg3: #18181f;
-    --card: #1c1c25;
-    --accent: #7c6dfa;
-    --accent2: #b4aaff;
-    --accent3: #e8b4f8;
-    --teal: #4dd9b8;
-    --text: #f0eeff;
-    --muted: #8884aa;
-    --border: rgba(124,109,250,0.18);
-    --border2: rgba(124,109,250,0.35);
-    --nav-bg: rgba(10,10,15,0.85);
-    --hero-h1-from: #fff;
-  }
-  :root.light {
-    --bg: #f5f4ff;
-    --bg2: #ede9ff;
-    --bg3: #eae6ff;
-    --card: #ffffff;
-    --accent: #5b4de0;
-    --accent2: #4a3cc7;
-    --accent3: #9b72c8;
-    --teal: #0e9e7a;
-    --text: #1a1730;
-    --muted: #5a5680;
-    --border: rgba(91,77,224,0.15);
-    --border2: rgba(91,77,224,0.3);
-    --nav-bg: rgba(245,244,255,0.9);
-    --hero-h1-from: #1a1730;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.7;
-    overflow-x: hidden;
-    transition: background 0.3s, color 0.3s;
-  }
+:root {
+  --bg: #080810;
+  --bg2: #0f0f1a;
+  --bg3: #141428;
+  --card: #12121e;
+  --card2: #1a1a2e;
+  --card3: #1f1f38;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.11);
+  --border3: rgba(255,255,255,0.18);
+  --accent: #6d5dfc;
+  --accent2: #9d8fff;
+  --accent3: #c4b5fd;
+  --teal: #2dd4bf;
+  --teal2: #5eead4;
+  --coral: #f87171;
+  --amber: #fbbf24;
+  --green: #34d399;
+  --pink: #f472b6;
+  --blue: #60a5fa;
+  --text: #eeeaf8;
+  --text2: #a89fc8;
+  --text3: #564f72;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --r: 18px;
+  --r-sm: 12px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);overflow:hidden}
 
-  /* THEME TOGGLE */
-  .theme-toggle {
-    background: var(--card);
-    border: 0.5px solid var(--border2);
-    border-radius: 99px;
-    padding: 0.35rem 0.9rem;
-    font-size: 0.8rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    color: var(--accent2);
-    cursor: pointer;
-    display: flex; align-items: center; gap: 0.4rem;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .theme-toggle:hover { background: var(--bg3); }
+/* PARTICLE CANVAS */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.35}
 
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 3rem;
-    background: var(--nav-bg);
-    backdrop-filter: blur(12px);
-    border-bottom: 0.5px solid var(--border);
-  }
-  .nav-logo {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: 1.1rem;
-    color: var(--accent2);
-    letter-spacing: 0.04em;
-    text-decoration: none;
-  }
-  .nav-links { display: flex; gap: 2rem; list-style: none; }
-  .nav-links a {
-    color: var(--muted); font-size: 0.85rem; text-decoration: none;
-    letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--accent2); }
+/* SCREENS */
+.screen{display:none;position:fixed;inset:0;overflow-y:auto;background:transparent;padding-bottom:calc(70px + var(--safe-bottom));z-index:1}
+.screen.active{display:block}
+.screen.fullscreen{padding-bottom:0}
+.screen::-webkit-scrollbar{display:none}
+.screen{scrollbar-width:none}
 
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 8rem 2rem 4rem;
-    position: relative; overflow: hidden;
-    text-align: center;
-  }
-  .hero-bg {
-    position: absolute; inset: 0; z-index: 0;
-    background:
-      radial-gradient(ellipse 60% 55% at 50% 30%, rgba(124,109,250,0.12) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 30% at 80% 70%, rgba(180,170,255,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 35% 25% at 20% 60%, rgba(77,217,184,0.06) 0%, transparent 60%);
-  }
-  .hero-grid {
-    position: absolute; inset: 0; z-index: 0;
-    background-image:
-      linear-gradient(rgba(124,109,250,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,109,250,0.04) 1px, transparent 1px);
-    background-size: 48px 48px;
-  }
-  .hero-content { position: relative; z-index: 1; max-width: 780px; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    background: rgba(124,109,250,0.12); border: 0.5px solid var(--border2);
-    border-radius: 99px; padding: 0.4rem 1rem;
-    font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--accent2); font-weight: 500; margin-bottom: 2rem;
-  }
-  .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); display: inline-block; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
-  .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(2.6rem, 6vw, 4.2rem);
-    font-weight: 800; line-height: 1.1;
-    background: linear-gradient(135deg, var(--hero-h1-from) 30%, var(--accent2) 70%, var(--accent3) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    margin-bottom: 0.5rem;
-  }
-  .hero-role {
-    font-size: 1.15rem; color: var(--accent2); font-weight: 300;
-    letter-spacing: 0.04em; margin-bottom: 1.5rem;
-    font-style: italic;
-  }
-  .hero-meta {
-    display: flex; justify-content: center; flex-wrap: wrap; gap: 2rem;
-    margin-bottom: 2.5rem;
-  }
-  .hero-meta-item { font-size: 0.85rem; color: var(--muted); }
-  .hero-meta-item strong { color: var(--text); font-weight: 500; display: block; }
-  .hero-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-  .btn-primary {
-    background: var(--accent); color: #fff;
-    padding: 0.75rem 2rem; border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
-    text-decoration: none; transition: background 0.2s, transform 0.15s;
-    border: none; cursor: pointer;
-  }
-  .btn-primary:hover { background: var(--accent2); color: var(--bg); transform: translateY(-2px); }
-  .btn-outline {
-    background: transparent; color: var(--accent2);
-    padding: 0.75rem 2rem; border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
-    text-decoration: none; transition: all 0.2s;
-    border: 1px solid var(--border2); cursor: pointer;
-  }
-  .btn-outline:hover { background: rgba(124,109,250,0.1); transform: translateY(-2px); }
+/* SPLASH */
+#screen-splash{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg)}
+.splash-logo{font-family:var(--font-head);font-size:32px;font-weight:800;background:linear-gradient(135deg,#fff 0%,var(--accent3) 60%,var(--teal) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.splash-sub{color:var(--text3);font-size:13px;margin-top:8px;letter-spacing:1px}
+.splash-ring{width:60px;height:60px;border-radius:50%;border:2px solid var(--border2);border-top-color:var(--accent);animation:spin 1s linear infinite;margin-bottom:24px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  /* SCHOOLS */
-  .school-badges {
-    display: flex; justify-content: center; align-items: center; gap: 1.5rem;
-    margin-top: 3rem; flex-wrap: wrap;
-  }
-  .school-badge {
-    display: flex; align-items: center; gap: 0.6rem;
-    background: var(--card); border: 0.5px solid var(--border);
-    border-radius: 10px; padding: 0.6rem 1.1rem;
-    font-size: 0.82rem; color: var(--muted); font-weight: 500;
-  }
-  .school-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .dot-purple { background: var(--accent); }
-  .dot-teal { background: var(--teal); }
+/* AUTH SCREEN */
+#screen-auth{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;background:var(--bg);padding:0 0 calc(48px + var(--safe-bottom))}
+.auth-bg-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.auth-orb{position:absolute;border-radius:50%;filter:blur(60px);animation:orbFloat 8s ease-in-out infinite}
+.auth-content{width:100%;padding:0 28px;position:relative;z-index:2;animation:fadeUp 0.6s ease}
+.auth-logo-wrap{text-align:center;margin-bottom:48px}
+.auth-logo-icon{font-size:56px;margin-bottom:16px;display:block}
+.auth-logo-name{font-family:var(--font-head);font-size:36px;font-weight:800;background:linear-gradient(135deg,#fff,var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.auth-logo-tagline{font-size:14px;color:var(--text2);margin-top:6px;line-height:1.5}
+.auth-features{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.auth-feat{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:12px 16px}
+.auth-feat-icon{font-size:20px;width:36px;text-align:center}
+.auth-feat-text{font-size:13px;color:var(--text2);line-height:1.4}
+.auth-feat-text strong{color:var(--text);display:block;font-weight:500}
+.btn-google{width:100%;padding:16px;background:#fff;border:none;border-radius:14px;color:#1a1a1a;font-family:var(--font-body);font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;margin-bottom:12px}
+.btn-google:active{transform:scale(0.98);opacity:0.9}
+.btn-google img{width:20px;height:20px}
+.btn-demo{width:100%;padding:14px;background:transparent;border:1px solid var(--border2);border-radius:14px;color:var(--text2);font-family:var(--font-body);font-size:14px;cursor:pointer;transition:all 0.2s}
+.btn-demo:active{background:var(--card)}
+.auth-note{font-size:11px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.5}
 
-  /* SECTIONS */
-  section { padding: 6rem 2rem; max-width: 1060px; margin: 0 auto; }
-  .section-label {
-    font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--accent2); font-weight: 600; margin-bottom: 0.75rem;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    font-weight: 700; margin-bottom: 1rem; line-height: 1.2;
-  }
-  .section-sub { font-size: 1rem; color: var(--muted); max-width: 560px; }
-  .divider { border: none; border-top: 0.5px solid var(--border); margin: 0; }
+/* NAV */
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,16,0.92);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:none;padding:0;padding-bottom:var(--safe-bottom);z-index:100}
+.nav-inner{display:flex}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0 8px;cursor:pointer;transition:all 0.25s;color:var(--text3);border:none;background:none;position:relative}
+.nav-item svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.7;fill:none;transition:all 0.25s}
+.nav-item span{font-size:10px;font-family:var(--font-body);letter-spacing:0.2px}
+.nav-item.active{color:var(--accent2)}
+.nav-item.active svg{stroke:var(--accent2)}
+.nav-dot{position:absolute;top:8px;right:calc(50% - 14px);width:6px;height:6px;border-radius:50%;background:var(--coral);display:none}
+.nav-item.has-notif .nav-dot{display:block}
 
-  /* PROJECT CARD */
-  .project-card {
-    background: var(--card);
-    border: 0.5px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem;
-    transition: border-color 0.2s, transform 0.2s, background 0.3s;
-  }
-  .project-card:hover { border-color: var(--border2); transform: translateY(-3px); }
-  .project-tag {
-    display: inline-block;
-    background: rgba(124,109,250,0.15);
-    color: var(--accent2);
-    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em;
-    text-transform: uppercase; padding: 0.25rem 0.7rem; border-radius: 6px;
-    margin-bottom: 1rem;
-  }
-  .project-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.35rem; font-weight: 700; margin-bottom: 0.75rem;
-  }
-  .project-desc { font-size: 0.93rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.5rem; }
-  .tech-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-  .pill {
-    background: rgba(77,217,184,0.1);
-    border: 0.5px solid rgba(77,217,184,0.25);
-    color: var(--teal); font-size: 0.75rem; font-weight: 500;
-    padding: 0.25rem 0.7rem; border-radius: 99px;
-  }
+/* ONBOARDING */
+#screen-onboard{background:var(--bg)}
+.onboard-step{display:none;flex-direction:column;min-height:100vh;padding:calc(60px + var(--safe-top)) 28px calc(40px + var(--safe-bottom));animation:fadeUp 0.4s ease}
+.onboard-step.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.ob-emoji{font-size:48px;margin-bottom:24px}
+.ob-title{font-family:var(--font-head);font-size:28px;font-weight:800;line-height:1.15;margin-bottom:10px;background:linear-gradient(135deg,var(--text) 0%,var(--accent3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ob-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:36px}
+.ob-step-dots{display:flex;gap:6px;margin-bottom:28px}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:var(--border2)}
+.ob-dot.active{background:var(--accent2);width:18px;border-radius:3px}
+.ob-form{display:flex;flex-direction:column;gap:16px;flex:1}
+.field-label{font-size:11px;font-weight:500;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+input[type=text],input[type=number],select,textarea{width:100%;padding:14px 16px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text);font-family:var(--font-body);font-size:15px;outline:none;transition:border 0.2s;-webkit-appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select option{background:var(--bg2)}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 16px;border-radius:40px;border:1px solid var(--border2);background:var(--card);color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.2s;user-select:none}
+.chip.selected{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.btn-primary{width:100%;padding:16px;background:var(--accent);border:none;border-radius:var(--r-sm);color:#fff;font-family:var(--font-head);font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;margin-top:auto}
+.btn-primary:active{transform:scale(0.98);opacity:0.9}
 
-  /* STATS */
-  .stats-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem; margin-top: 3rem;
-  }
-  .stat-card {
-    background: var(--card); border: 0.5px solid var(--border);
-    border-radius: 12px; padding: 1.5rem; text-align: center;
-  }
-  .stat-num {
-    font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800;
-    color: var(--accent2); display: block; line-height: 1;
-  }
-  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.4rem; }
+/* COMMON COMPONENTS */
+.page-top{padding:calc(54px + var(--safe-top)) 20px 16px}
+.page-title{font-family:var(--font-head);font-size:23px;font-weight:800}
+.page-sub{font-size:13px;color:var(--text3);margin-top:3px}
+.section-title{font-family:var(--font-head);font-size:15px;font-weight:700;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.divider{height:1px;background:var(--border);margin:0 20px}
 
-  /* TIMELINE */
-  .timeline { position: relative; padding-left: 2rem; }
-  .timeline::before {
-    content: ''; position: absolute; left: 0.45rem; top: 0; bottom: 0;
-    width: 1px; background: var(--border2);
-  }
-  .tl-week {
-    position: relative; margin-bottom: 2.5rem;
-    animation: fadeUp 0.5s ease both;
-  }
-  @keyframes fadeUp { from { opacity:0; transform: translateY(16px); } to { opacity:1; transform: none; } }
-  .tl-dot {
-    position: absolute; left: -1.73rem; top: 0.35rem;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: var(--accent); border: 2px solid var(--bg);
-    box-shadow: 0 0 0 3px rgba(124,109,250,0.2);
-  }
-  .tl-week-label {
-    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
-    color: var(--accent2); font-weight: 600; margin-bottom: 0.35rem;
-  }
-  .tl-week-title {
-    font-family: 'Syne', sans-serif; font-weight: 700;
-    font-size: 1.05rem; margin-bottom: 0.5rem;
-  }
-  .tl-days { display: flex; flex-direction: column; gap: 0.4rem; }
-  .tl-day {
-    display: flex; gap: 0.75rem;
-    background: var(--bg3); border: 0.5px solid var(--border);
-    border-radius: 8px; padding: 0.6rem 0.9rem;
-    font-size: 0.86rem;
-  }
-  .tl-day-date { color: var(--accent2); font-weight: 600; min-width: 60px; font-size: 0.78rem; }
-  .tl-day-text { color: var(--muted); }
-  .tl-reflection {
-    margin-top: 0.75rem;
-    background: rgba(124,109,250,0.06);
-    border-left: 2px solid var(--accent);
-    border-radius: 0 8px 8px 0;
-    padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--muted);
-  }
-  .tl-reflection strong { color: var(--accent2); font-weight: 500; }
+/* HOME */
+.home-header{padding:calc(52px + var(--safe-top)) 20px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.home-avatar{width:42px;height:42px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;object-fit:cover;cursor:pointer}
+.home-avatar-placeholder{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#9333ea);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:17px;font-weight:800;cursor:pointer;flex-shrink:0}
+.home-greeting-name{font-family:var(--font-head);font-size:24px;font-weight:800;line-height:1.2}
+.home-date{font-size:12px;color:var(--text3);margin-top:3px}
 
-  /* SKILLS */
-  .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 2.5rem; }
-  .skill-card {
-    background: var(--card); border: 0.5px solid var(--border);
-    border-radius: 12px; padding: 1.25rem 1.5rem;
-  }
-  .skill-icon { font-size: 1.5rem; margin-bottom: 0.6rem; }
-  .skill-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; }
-  .skill-desc { font-size: 0.83rem; color: var(--muted); }
+/* XP BAR */
+.xp-bar-wrap{margin:14px 20px 0;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.xp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.xp-level{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-head);font-size:13px;font-weight:700;color:var(--accent2)}
+.xp-val{font-size:12px;color:var(--text3)}
+.xp-bar{height:5px;background:var(--border2);border-radius:3px;overflow:hidden}
+.xp-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--pink));transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1)}
 
-  /* SURVEY */
-  .survey-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-top: 2.5rem; }
-  .survey-card {
-    background: var(--card); border: 0.5px solid var(--border);
-    border-radius: 14px; padding: 1.5rem;
-  }
-  .survey-q { font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.5; }
-  .survey-bar-wrap { margin-bottom: 0.5rem; }
-  .survey-bar-label { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.3rem; }
-  .survey-bar-label .pct { color: var(--accent2); font-weight: 600; }
-  .bar-track { background: rgba(128,128,180,0.15); border-radius: 99px; height: 6px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--accent), var(--teal)); transition: width 1s ease; }
+/* QUOTE CARD */
+.quote-card{margin:14px 20px 0;background:linear-gradient(135deg,rgba(109,93,252,0.18),rgba(45,212,191,0.1));border:1px solid rgba(109,93,252,0.25);border-radius:var(--r);padding:18px}
+.quote-text{font-size:14px;font-style:italic;color:var(--text2);line-height:1.65}
+.quote-author{font-size:11px;color:var(--text3);margin-top:8px;letter-spacing:0.3px}
 
-  /* ROADMAP */
-  .roadmap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0; margin-top: 2.5rem; border: 0.5px solid var(--border); border-radius: 14px; overflow: hidden; }
-  .roadmap-phase {
-    padding: 1.5rem 1.25rem;
-    border-right: 0.5px solid var(--border);
-    position: relative;
-  }
-  .roadmap-phase:last-child { border-right: none; }
-  .roadmap-phase.active { background: rgba(124,109,250,0.1); }
-  .roadmap-num {
-    font-family: 'Syne', sans-serif; font-size: 0.7rem; font-weight: 800;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 0.5rem;
-  }
-  .roadmap-label { font-size: 0.85rem; font-weight: 500; color: var(--text); line-height: 1.4; }
-  .roadmap-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent); margin-bottom: 0.6rem;
-  }
-  .roadmap-phase.done .roadmap-dot { background: var(--teal); }
-  .roadmap-phase.future .roadmap-dot { background: var(--muted); opacity: 0.4; }
+/* STREAK ROW */
+.streak-row{margin:14px 20px 0;display:flex;gap:10px}
+.streak-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 12px;text-align:center;cursor:pointer;transition:all 0.2s}
+.streak-card:active{transform:scale(0.97)}
+.streak-num{font-family:var(--font-head);font-size:26px;font-weight:800}
+.streak-icon{font-size:18px;margin-bottom:4px}
+.streak-lbl{font-size:10px;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-top:3px}
 
-  /* REFLECTIONS */
-  .reflection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 2.5rem; }
-  @media (max-width: 640px) { .reflection-grid { grid-template-columns: 1fr; } }
-  .reflection-card {
-    background: var(--card); border: 0.5px solid var(--border);
-    border-radius: 14px; padding: 1.5rem;
-  }
-  .reflection-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
-  .reflection-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: rgba(124,109,250,0.15);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1rem;
-  }
-  .reflection-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
-  .reflection-body { font-size: 0.86rem; color: var(--muted); line-height: 1.65; }
+/* STAT GRID */
+.stat-grid{margin:14px 20px 0;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.stat-card:active{transform:scale(0.97)}
+.stat-card-accent{position:absolute;right:-10px;bottom:-10px;font-size:44px;opacity:0.08;pointer-events:none}
+.stat-icon-wrap{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:10px}
+.stat-num{font-family:var(--font-head);font-size:22px;font-weight:800}
+.stat-lbl{font-size:10px;color:var(--text3);letter-spacing:0.5px;text-transform:uppercase;margin-top:3px}
+.mini-prog{height:3px;background:var(--border2);border-radius:2px;overflow:hidden;margin-top:10px}
+.mini-fill{height:100%;border-radius:2px;transition:width 0.6s ease}
 
-  /* FOOTER */
-  footer {
-    text-align: center; padding: 3rem 2rem;
-    border-top: 0.5px solid var(--border);
-    font-size: 0.82rem; color: var(--muted);
-  }
-  footer a { color: var(--accent2); text-decoration: none; }
+/* CHALLENGE CARD */
+.challenge-wrap{margin:14px 20px 0}
+.challenge-card{background:var(--card);border:1px solid var(--border2);border-radius:var(--r);padding:16px}
+.challenge-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.challenge-badge{padding:3px 10px;border-radius:40px;background:rgba(251,191,36,0.15);color:var(--amber);font-size:11px;font-weight:600}
+.challenge-title{font-size:14px;font-weight:500;margin-bottom:6px}
+.challenge-tasks{display:flex;flex-direction:column;gap:8px}
+.challenge-task{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--card2);border-radius:10px;cursor:pointer;transition:all 0.2s}
+.challenge-task:active{transform:scale(0.98)}
+.task-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.25s}
+.task-check.done{background:var(--green);border-color:var(--green)}
+.task-check.done::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+.task-text{font-size:13px;flex:1}
+.task-xp{font-size:11px;color:var(--accent2);font-weight:600}
 
-  /* ABOUT */
-  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; margin-top: 2.5rem; }
-  @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; } }
-  .about-text p { font-size: 0.95rem; color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
-  .info-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
-  .info-list li { display: flex; gap: 0.75rem; align-items: flex-start; font-size: 0.88rem; }
-  .info-list li span:first-child { color: var(--accent2); font-weight: 600; min-width: 90px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 0.15rem; }
-  .info-list li span:last-child { color: var(--muted); }
+/* CHECKIN BANNER */
+.checkin-banner{margin:14px 20px 0;background:linear-gradient(135deg,var(--accent) 0%,#9333ea 100%);border-radius:var(--r);padding:18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.2s}
+.checkin-banner:active{transform:scale(0.98)}
+.checkin-banner.done{background:var(--card);border:1px solid var(--border2)}
+.checkin-banner-title{font-family:var(--font-head);font-size:15px;font-weight:700}
+.checkin-banner-sub{font-size:12px;opacity:0.75;margin-top:3px}
+.checkin-banner.done .checkin-banner-sub{opacity:1;color:var(--text3)}
 
-  @media (max-width: 768px) {
-    nav { padding: 1rem 1.5rem; }
-    .nav-links { display: none; }
-  }
+/* RECENT LOGS */
+.logs-wrap{margin:14px 20px 0}
+.log-item{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px}
+.log-mood-icon{width:38px;height:38px;border-radius:11px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+.log-text-title{font-size:14px;font-weight:500}
+.log-text-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.log-right-val{margin-left:auto;text-align:right}
+.log-val-num{font-family:var(--font-head);font-size:14px;font-weight:700;color:var(--accent2)}
+.log-val-sub{font-size:11px;color:var(--text3)}
+
+/* CHECK-IN SCREEN */
+.mood-row{display:flex;gap:7px}
+.mood-btn{flex:1;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--card);border:1.5px solid var(--border2);border-radius:var(--r-sm);cursor:pointer;transition:all 0.2s;font-size:24px}
+.mood-btn span{font-size:9px;color:var(--text3);line-height:1}
+.mood-btn.selected{border-color:var(--accent);background:rgba(109,93,252,0.15);transform:scale(1.05)}
+.energy-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.slider-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:12px}
+input[type=range]{width:100%;-webkit-appearance:none;height:7px;border-radius:4px;background:var(--border2);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 5px rgba(109,93,252,0.2)}
+.energy-big-val{text-align:center;font-family:var(--font-head);font-size:48px;font-weight:800;color:var(--accent2);margin-top:12px;transition:color 0.3s}
+.toggle-chips{display:flex;flex-wrap:wrap;gap:8px}
+.tchip{padding:9px 15px;border-radius:40px;border:1px solid var(--border2);background:var(--card);color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.2s;user-select:none}
+.tchip.on{background:rgba(45,212,191,0.12);border-color:var(--teal);color:var(--teal2)}
+
+/* FOCUS SCREEN */
+.timer-wrap{padding:30px 20px 20px;text-align:center}
+.timer-ring-wrap{width:220px;height:220px;margin:0 auto 24px;position:relative}
+.timer-ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-time-big{font-family:var(--font-head);font-size:44px;font-weight:800;letter-spacing:-1px}
+.timer-status-lbl{font-size:11px;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+.timer-mode-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:22px}
+.dur-btn{padding:8px 18px;border-radius:40px;border:1px solid var(--border2);background:var(--card);color:var(--text2);font-size:13px;cursor:pointer;transition:all 0.2s}
+.dur-btn.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.timer-ctrl-row{display:flex;gap:14px;align-items:center;justify-content:center}
+.t-btn{width:54px;height:54px;border-radius:50%;border:1px solid var(--border2);background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;transition:all 0.2s}
+.t-btn.big{width:74px;height:74px;background:var(--accent);border-color:var(--accent);font-size:28px}
+.t-btn:active{transform:scale(0.92)}
+.session-label-wrap{margin:0 20px 14px}
+.sessions-list{margin:0 20px}
+.session-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:8px}
+.session-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.session-name{font-size:14px;flex:1}
+.session-mins{font-size:12px;color:var(--text3)}
+
+/* INSIGHTS */
+.ins-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:0 20px 16px}
+.ins-stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 10px;text-align:center}
+.ins-val{font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--accent2)}
+.ins-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin:0 20px 14px}
+.chart-title{font-family:var(--font-head);font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.chart-badge{font-size:10px;padding:3px 8px;border-radius:20px;background:rgba(109,93,252,0.15);color:var(--accent2)}
+.heatmap-wrap{margin:0 20px 14px}
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.heatmap-cell{aspect-ratio:1;border-radius:4px;background:var(--card2);transition:all 0.3s;cursor:pointer;position:relative}
+.heatmap-cell:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card3);border:1px solid var(--border2);padding:4px 8px;border-radius:6px;font-size:10px;white-space:nowrap;z-index:10;pointer-events:none}
+
+/* AI COACH */
+.ai-top{padding:calc(52px + var(--safe-top)) 20px 14px;display:flex;align-items:center;gap:12px}
+.ai-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#9333ea);display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0}
+.ai-name{font-family:var(--font-head);font-size:18px;font-weight:800}
+.ai-status{font-size:11px;color:var(--teal);margin-top:2px}
+.chat-area{padding:0 16px;display:flex;flex-direction:column;gap:12px;padding-bottom:130px}
+.msg{max-width:84%}
+.msg.user{align-self:flex-end}
+.bubble{padding:12px 15px;border-radius:18px;font-size:14px;line-height:1.6}
+.msg.ai .bubble{background:var(--card);border:1px solid var(--border2);border-bottom-left-radius:4px;color:var(--text)}
+.msg.user .bubble{background:var(--accent);border-bottom-right-radius:4px;color:#fff}
+.msg-ts{font-size:10px;color:var(--text3);margin-top:4px;padding:0 4px}
+.msg.user .msg-ts{text-align:right}
+.typing-wrap{display:flex;gap:4px;padding:14px 15px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:bounce 1.2s ease infinite}
+.dot:nth-child(2){animation-delay:0.15s}
+.dot:nth-child(3){animation-delay:0.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+.chat-pills{display:flex;gap:7px;overflow-x:auto;padding:0 16px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.chat-pills::-webkit-scrollbar{display:none}
+.chat-pill{flex-shrink:0;padding:8px 14px;background:var(--card);border:1px solid var(--border2);border-radius:40px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.chat-pill:active{background:var(--card2)}
+.chat-bar{position:fixed;bottom:calc(70px + var(--safe-bottom));left:0;right:0;padding:10px 14px;background:rgba(8,8,16,0.94);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end;z-index:50}
+.chat-input{flex:1;background:var(--card);border:1px solid var(--border2);border-radius:22px;padding:10px 15px;color:var(--text);font-family:var(--font-body);font-size:14px;resize:none;max-height:100px;outline:none;line-height:1.45;-webkit-appearance:none}
+.chat-send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;transition:all 0.2s}
+.chat-send-btn:active{transform:scale(0.88)}
+
+/* PROFILE */
+.profile-hero{padding:calc(52px + var(--safe-top)) 20px 20px;text-align:center}
+.profile-avatar-lg{width:84px;height:84px;border-radius:50%;margin:0 auto 12px;border:3px solid var(--border2);object-fit:cover}
+.profile-avatar-placeholder{width:84px;height:84px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),#9333ea);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:32px;font-weight:800}
+.profile-name{font-family:var(--font-head);font-size:22px;font-weight:800}
+.profile-email{font-size:13px;color:var(--text3);margin-top:3px}
+.badges-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:40px;font-size:12px;font-weight:600}
+.badge-purple{background:rgba(109,93,252,0.15);color:var(--accent2)}
+.badge-teal{background:rgba(45,212,191,0.12);color:var(--teal)}
+.badge-amber{background:rgba(251,191,36,0.12);color:var(--amber)}
+.badge-coral{background:rgba(248,113,113,0.12);color:var(--coral)}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 20px 0}
+.p-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 10px;text-align:center}
+.p-stat-val{font-family:var(--font-head);font-size:22px;font-weight:800}
+.p-stat-lbl{font-size:10px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:0.5px}
+.settings-list{margin:20px 20px 0}
+.setting-row{display:flex;align-items:center;padding:15px 0;border-bottom:1px solid var(--border);gap:12px;cursor:pointer}
+.setting-row:last-child{border-bottom:none}
+.setting-icon{width:36px;height:36px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.setting-text .t{font-size:14px;font-weight:500}
+.setting-text .s{font-size:12px;color:var(--text3);margin-top:1px}
+.setting-right{margin-left:auto;font-size:13px;color:var(--text3)}
+
+/* MODALS */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;display:none;align-items:flex-end;backdrop-filter:blur(6px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border-radius:24px 24px 0 0;padding:22px 22px calc(22px + var(--safe-bottom));width:100%;max-height:90vh;overflow-y:auto;animation:slideUp 0.38s cubic-bezier(0.16,1,0.3,1);border:1px solid var(--border2);border-bottom:none}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 18px}
+.modal-title{font-family:var(--font-head);font-size:19px;font-weight:800;margin-bottom:18px}
+.water-cups-grid{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0 16px}
+.wcup{width:46px;height:54px;border:2px solid var(--border2);border-radius:7px;cursor:pointer;transition:all 0.25s;display:flex;align-items:flex-end;overflow:hidden;flex-shrink:0}
+.wcup.full{border-color:var(--teal)}
+.wcup-fill{width:100%;background:linear-gradient(to top,var(--teal),var(--teal2));transition:height 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+
+/* LEVEL UP ANIMATION */
+.levelup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.levelup-overlay.show{display:flex;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.levelup-card{background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:36px 28px;text-align:center;max-width:300px;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes popIn{from{transform:scale(0.6);opacity:0}to{transform:scale(1);opacity:1}}
+.levelup-emoji{font-size:64px;margin-bottom:16px}
+.levelup-title{font-family:var(--font-head);font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--amber),var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.levelup-sub{font-size:14px;color:var(--text2);margin-top:8px;line-height:1.5}
+.levelup-btn{margin-top:20px;padding:13px 32px;background:var(--accent);border:none;border-radius:40px;color:#fff;font-family:var(--font-head);font-size:15px;font-weight:700;cursor:pointer}
+
+/* TOAST */
+.toast{position:fixed;top:calc(60px + var(--safe-top));left:50%;transform:translateX(-50%) translateY(-20px);background:var(--card2);border:1px solid var(--border2);border-radius:40px;padding:10px 20px;font-size:13px;color:var(--text);z-index:300;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 40px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* PROGRESS BAR */
+.prog-bar{height:5px;background:var(--border2);border-radius:3px;overflow:hidden;margin-top:8px}
+.prog-fill{height:100%;border-radius:3px;transition:width 0.6s ease}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:36px 20px;color:var(--text3)}
+.empty-icon{font-size:32px;margin-bottom:10px}
+.empty-text{font-size:13px;line-height:1.6}
+
+/* SIGN OUT BTN */
+.signout-btn{width:calc(100% - 40px);margin:12px 20px;padding:14px;background:transparent;border:1px solid rgba(248,113,113,0.3);border-radius:var(--r-sm);color:var(--coral);font-family:var(--font-body);font-size:14px;cursor:pointer;transition:all 0.2s}
+.signout-btn:active{background:rgba(248,113,113,0.08)}
+
+/* SCROLLBAR */
+.screen::-webkit-scrollbar,.chat-area::-webkit-scrollbar{display:none}
 </style>
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="#">INTAN</a>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#project">Project</a></li>
-    <li><a href="#timeline">Logbook</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#reflections">Reflections</a></li>
-  </ul>
-  <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙</button>
+<!-- PARTICLE CANVAS -->
+<canvas id="particles"></canvas>
+
+<!-- SPLASH -->
+<div id="screen-splash" class="screen fullscreen active" style="display:flex">
+ <div class="splash-ring"></div>
+ <div class="splash-logo">FocusFlow</div>
+ <div class="splash-sub">Loading your mind space…</div>
+</div>
+
+<!-- AUTH -->
+<div id="screen-auth" class="screen fullscreen" style="position:fixed;inset:0;overflow-y:auto;padding-bottom:0">
+ <div class="auth-bg-art">
+  <div class="auth-orb" style="width:300px;height:300px;background:rgba(109,93,252,0.18);top:-60px;left:-80px;animation-delay:0s"></div>
+  <div class="auth-orb" style="width:200px;height:200px;background:rgba(45,212,191,0.12);bottom:120px;right:-60px;animation-delay:3s"></div>
+  <div class="auth-orb" style="width:160px;height:160px;background:rgba(244,114,182,0.1);top:40%;left:60%;animation-delay:6s"></div>
+ </div>
+ <div style="min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 calc(40px + var(--safe-bottom))">
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 28px 0">
+   <div class="auth-logo-wrap" style="width:100%">
+    <span class="auth-logo-icon">🧠</span>
+    <div class="auth-logo-name">FocusFlow</div>
+    <div class="auth-logo-tagline">Track your mind. Build your best days.<br>Powered by AI coaching.</div>
+   </div>
+  </div>
+  <div style="padding:0 28px">
+   <div class="auth-features">
+    <div class="auth-feat"><div class="auth-feat-icon">⚡</div><div class="auth-feat-text"><strong>Daily energy & mood check-ins</strong>See your patterns, beat the slumps</div></div>
+    <div class="auth-feat"><div class="auth-feat-icon">🎯</div><div class="auth-feat-text"><strong>Focus timer + session tracking</strong>Deep work blocks that actually stick</div></div>
+    <div class="auth-feat"><div class="auth-feat-icon">🤖</div><div class="auth-feat-text"><strong>AI coach reads your real data</strong>Personalised tips, not generic advice</div></div>
+    <div class="auth-feat"><div class="auth-feat-icon">🔥</div><div class="auth-feat-text"><strong>Streaks, XP & weekly challenges</strong>Stay motivated every single day</div></div>
+   </div>
+   <button class="btn-google" onclick="signInGoogle()">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    Continue with Google
+   </button>
+   <button class="btn-demo" onclick="startDemo()">✨ Try Demo Mode (no sign-in)</button>
+   <div class="auth-note">Your data is synced securely to your Google account.<br>No spam, no ads. Ever.</div>
+  </div>
+ </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="screen-onboard" class="screen fullscreen">
+ <!-- Step 1 -->
+ <div class="onboard-step active" id="ob1">
+  <div class="ob-step-dots"><div class="ob-dot active"></div><div class="ob-dot"></div><div class="ob-dot"></div></div>
+  <div class="ob-emoji">👋</div>
+  <div class="ob-title">What should we call you?</div>
+  <div class="ob-sub">This shows on your home screen and AI coach uses it to feel personal.</div>
+  <div class="ob-form">
+   <div><div class="field-label">Your name</div><input type="text" id="ob-name" placeholder="e.g. Amir, Sarah, Dev…" maxlength="20" autocomplete="given-name"></div>
+   <button class="btn-primary" onclick="obNext(1)">Continue →</button>
+  </div>
+ </div>
+ <!-- Step 2 -->
+ <div class="onboard-step" id="ob2">
+  <div class="ob-step-dots"><div class="ob-dot"></div><div class="ob-dot active"></div><div class="ob-dot"></div></div>
+  <div class="ob-emoji">🎯</div>
+  <div class="ob-title">What's your main goal?</div>
+  <div class="ob-sub">We'll tailor your daily challenges, AI coaching, and insights around this.</div>
+  <div class="ob-form">
+   <div class="chip-group" id="ob-goals">
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Study smarter">📚 Study smarter</div>
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Beat procrastination">🚀 Beat procrastination</div>
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Improve energy levels">⚡ Improve energy</div>
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Reduce stress & anxiety">🧘 Reduce stress</div>
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Get better sleep">😴 Better sleep</div>
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Build daily consistency">🔥 Build consistency</div>
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Improve mental clarity">🧠 Mental clarity</div>
+    <div class="chip" onclick="pickOne(this,'ob-goals')" data-v="Work-life balance">⚖️ Work-life balance</div>
+   </div>
+   <button class="btn-primary" onclick="obNext(2)" style="margin-top:auto">Continue →</button>
+  </div>
+ </div>
+ <!-- Step 3 -->
+ <div class="onboard-step" id="ob3">
+  <div class="ob-step-dots"><div class="ob-dot"></div><div class="ob-dot"></div><div class="ob-dot active"></div></div>
+  <div class="ob-emoji">⏰</div>
+  <div class="ob-title">When do you peak?</div>
+  <div class="ob-sub">Your AI coach will suggest when to schedule your most demanding tasks.</div>
+  <div class="ob-form">
+   <div class="chip-group" id="ob-peak">
+    <div class="chip" onclick="pickOne(this,'ob-peak')" data-v="Early bird (5–8am)">🌅 Early bird (5–8am)</div>
+    <div class="chip" onclick="pickOne(this,'ob-peak')" data-v="Morning (8–12pm)">☀️ Morning (8–12pm)</div>
+    <div class="chip" onclick="pickOne(this,'ob-peak')" data-v="Afternoon (12–5pm)">🌤 Afternoon (12–5pm)</div>
+    <div class="chip" onclick="pickOne(this,'ob-peak')" data-v="Evening (5–9pm)">🌆 Evening (5–9pm)</div>
+    <div class="chip" onclick="pickOne(this,'ob-peak')" data-v="Night owl (9pm+)">🦉 Night owl (9pm+)</div>
+   </div>
+   <button class="btn-primary" onclick="obNext(3)" style="margin-top:auto">Let's go 🚀</button>
+  </div>
+ </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+
+<!-- HOME -->
+<div id="screen-home" class="screen">
+ <div class="home-header">
+  <div>
+   <div class="home-greeting-name" id="home-greeting">Good morning ✨</div>
+   <div class="home-date" id="home-date"></div>
+  </div>
+  <div id="home-avatar-wrap"></div>
+ </div>
+
+ <!-- XP BAR -->
+ <div class="xp-bar-wrap">
+  <div class="xp-row">
+   <div class="xp-level">⚡ Level <span id="xp-level">1</span> — <span id="xp-level-name">Beginner</span></div>
+   <div class="xp-val"><span id="xp-cur">0</span> / <span id="xp-next">100</span> XP</div>
+  </div>
+  <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+ </div>
+
+ <!-- DAILY QUOTE -->
+ <div class="quote-card">
+  <div class="quote-text" id="daily-quote">"The secret of getting ahead is getting started."</div>
+  <div class="quote-author" id="daily-author">— Mark Twain</div>
+ </div>
+
+ <!-- STREAK ROW -->
+ <div class="streak-row">
+  <div class="streak-card" onclick="navTo('checkin')">
+   <div class="streak-icon">🔥</div>
+   <div class="streak-num" id="home-streak">0</div>
+   <div class="streak-lbl">Day streak</div>
+  </div>
+  <div class="streak-card" onclick="showWaterModal()">
+   <div class="streak-icon">💧</div>
+   <div class="streak-num" id="home-water">0/8</div>
+   <div class="streak-lbl">Water cups</div>
+  </div>
+  <div class="streak-card" onclick="navTo('focus')">
+   <div class="streak-icon">🎯</div>
+   <div class="streak-num" id="home-focus-mins">0</div>
+   <div class="streak-lbl">Focus mins</div>
+  </div>
+ </div>
+
+ <!-- STAT GRID -->
+ <div class="stat-grid">
+  <div class="stat-card" onclick="navTo('checkin')">
+   <div class="stat-card-accent">⚡</div>
+   <div class="stat-icon-wrap" style="background:rgba(109,93,252,0.15)">⚡</div>
+   <div class="stat-num" id="stat-energy">—</div>
+   <div class="stat-lbl">Energy today</div>
+   <div class="mini-prog"><div class="mini-fill" id="mpfill-energy" style="width:0%;background:linear-gradient(90deg,var(--accent),var(--pink))"></div></div>
+  </div>
+  <div class="stat-card" onclick="showSleepModal()">
+   <div class="stat-card-accent">😴</div>
+   <div class="stat-icon-wrap" style="background:rgba(129,140,248,0.15)">😴</div>
+   <div class="stat-num" id="stat-sleep">—</div>
+   <div class="stat-lbl">Sleep hours</div>
+   <div class="mini-prog"><div class="mini-fill" id="mpfill-sleep" style="width:0%;background:linear-gradient(90deg,#818cf8,var(--accent2))"></div></div>
+  </div>
+  <div class="stat-card" onclick="navTo('insights')">
+   <div class="stat-card-accent">📊</div>
+   <div class="stat-icon-wrap" style="background:rgba(45,212,191,0.15)">😊</div>
+   <div class="stat-num" id="stat-mood">—</div>
+   <div class="stat-lbl">Mood today</div>
+   <div class="mini-prog"><div class="mini-fill" id="mpfill-mood" style="width:0%;background:linear-gradient(90deg,var(--teal),var(--green))"></div></div>
+  </div>
+  <div class="stat-card" onclick="navTo('insights')">
+   <div class="stat-card-accent">🏆</div>
+   <div class="stat-icon-wrap" style="background:rgba(251,191,36,0.15)">🏆</div>
+   <div class="stat-num" id="stat-xp-total">0</div>
+   <div class="stat-lbl">Total XP</div>
+   <div class="mini-prog"><div class="mini-fill" id="mpfill-xp" style="width:0%;background:linear-gradient(90deg,var(--amber),var(--coral))"></div></div>
+  </div>
+ </div>
+
+ <!-- CHECKIN BANNER -->
+ <div class="checkin-banner" id="home-ci-banner" onclick="navTo('checkin')">
+  <div>
+   <div class="checkin-banner-title">📋 Log today's check-in</div>
+   <div class="checkin-banner-sub">Track energy, mood & blockers</div>
+  </div>
+  <div style="font-size:22px">→</div>
+ </div>
+
+ <!-- WEEKLY CHALLENGE -->
+ <div class="challenge-wrap">
+  <div class="challenge-card">
+   <div class="challenge-header">
+    <div class="section-title" style="margin:0">Weekly Challenge</div>
+    <div class="challenge-badge">🏅 +150 XP</div>
+   </div>
+   <div class="challenge-tasks" id="challenge-tasks"></div>
+  </div>
+ </div>
+
+ <!-- RECENT LOGS -->
+ <div class="logs-wrap">
+  <div class="section-title">Recent check-ins</div>
+  <div id="home-logs"></div>
+ </div>
+
+ <div style="height:20px"></div>
+</div>
+
+<!-- CHECK-IN -->
+<div id="screen-checkin" class="screen">
+ <div class="page-top">
+  <div class="page-title">Daily check-in</div>
+  <div class="page-sub" id="ci-date-label"></div>
+ </div>
+
+ <div style="padding:0 20px">
+  <!-- MOOD -->
+  <div style="margin-bottom:18px">
+   <div class="section-title">How's your mood? 😊</div>
+   <div class="mood-row">
+    <div class="mood-btn" data-m="terrible" onclick="pickMood(this)">😫<span>Terrible</span></div>
+    <div class="mood-btn" data-m="bad" onclick="pickMood(this)">😕<span>Bad</span></div>
+    <div class="mood-btn" data-m="okay" onclick="pickMood(this)">😐<span>Okay</span></div>
+    <div class="mood-btn" data-m="good" onclick="pickMood(this)">🙂<span>Good</span></div>
+    <div class="mood-btn" data-m="great" onclick="pickMood(this)">🤩<span>Great</span></div>
+   </div>
+  </div>
+
+  <!-- ENERGY -->
+  <div style="margin-bottom:18px">
+   <div class="section-title">Energy level ⚡</div>
+   <div class="energy-wrap">
+    <div class="slider-row"><span>💀 Drained</span><span>😐 Moderate</span><span>⚡ Energized</span></div>
+    <input type="range" min="1" max="10" value="5" id="energy-slider" oninput="onEnergySlide(this.value)">
+    <div class="energy-big-val" id="energy-big">5</div>
+   </div>
+  </div>
+
+  <!-- SLEEP -->
+  <div style="margin-bottom:18px">
+   <div class="section-title">Sleep last night 😴</div>
+   <div class="card" style="display:flex;align-items:center;gap:12px;padding:16px">
+    <span style="font-size:26px">🌙</span>
+    <input type="number" id="ci-sleep" min="0" max="24" step="0.5" placeholder="Hours (e.g. 7.5)" style="border:none;background:transparent;flex:1;font-size:18px;color:var(--text);outline:none">
+    <span style="font-size:14px;color:var(--text3)">hrs</span>
+   </div>
+  </div>
+
+  <!-- BLOCKERS -->
+  <div style="margin-bottom:18px">
+   <div class="section-title">Any blockers today? 🚧</div>
+   <div class="toggle-chips" id="ci-blockers">
+    <div class="tchip" onclick="this.classList.toggle('on')">😣 Anxiety</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">🤕 Headache</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">😪 Fatigue</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">😵 Overwhelmed</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">😤 Distracted</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">🍔 Poor eating</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">📵 No movement</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">☕ Too much caffeine</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">📱 Phone addiction</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">💔 Personal issues</div>
+   </div>
+  </div>
+
+  <!-- WINS -->
+  <div style="margin-bottom:18px">
+   <div class="section-title">Any wins today? 🏆</div>
+   <div class="toggle-chips" id="ci-wins">
+    <div class="tchip" onclick="this.classList.toggle('on')" style="--on-bg:rgba(52,211,153,0.12);--on-border:var(--green);--on-color:#6ee7b7">✅ Completed a task</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">🏋️ Exercised</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">🥗 Ate well</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">🧘 Meditated</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">📚 Read something</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">🚶 Went outside</div>
+    <div class="tchip" onclick="this.classList.toggle('on')">😴 Slept well</div>
+   </div>
+  </div>
+
+  <!-- NOTE -->
+  <div style="margin-bottom:20px">
+   <div class="section-title">Quick note ✍️</div>
+   <textarea id="ci-note" rows="3" placeholder="How's your day going? Anything worth remembering…" style="border-radius:var(--r-sm);resize:none"></textarea>
+  </div>
+
+  <button class="btn-primary" onclick="saveCheckin()">Save check-in ✓</button>
+  <div style="height:20px"></div>
+ </div>
+</div>
+
+<!-- FOCUS -->
+<div id="screen-focus" class="screen">
+ <div class="page-top">
+  <div class="page-title">Focus session 🎯</div>
+  <div class="page-sub">Deep work blocks · Pomodoro · Custom</div>
+ </div>
+
+ <div class="timer-wrap">
+  <div class="timer-ring-wrap">
+   <svg viewBox="0 0 220 220">
+    <circle cx="110" cy="110" r="96" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+    <circle id="timer-ring" cx="110" cy="110" r="96" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round"
+     stroke-dasharray="603" stroke-dashoffset="603" style="transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 8px rgba(109,93,252,0.5))"/>
+   </svg>
+   <div class="timer-inner">
+    <div class="timer-time-big" id="timer-disp">25:00</div>
+    <div class="timer-status-lbl" id="timer-lbl">Ready</div>
+   </div>
+  </div>
+
+  <div class="timer-mode-row">
+   <div class="dur-btn on" data-m="25" onclick="setDur(25,this)">25 min</div>
+   <div class="dur-btn" data-m="45" onclick="setDur(45,this)">45 min</div>
+   <div class="dur-btn" data-m="60" onclick="setDur(60,this)">60 min</div>
+   <div class="dur-btn" data-m="90" onclick="setDur(90,this)">90 min</div>
+   <div class="dur-btn" data-m="custom" onclick="setCustomDur()">Custom</div>
+  </div>
+
+  <div class="timer-ctrl-row">
+   <button class="t-btn" onclick="resetTimer()" title="Reset">↺</button>
+   <button class="t-btn big" id="play-btn" onclick="toggleTimer()">▶</button>
+   <button class="t-btn" onclick="doneEarly()" title="Finish early">✓</button>
+  </div>
+ </div>
+
+ <div class="session-label-wrap">
+  <div class="field-label">What are you working on?</div>
+  <input type="text" id="session-name" placeholder="e.g. Algorithms chapter, Assignment draft…">
+ </div>
+
+ <div class="sessions-list">
+  <div class="section-title">Today's sessions</div>
+  <div id="focus-sessions-list"></div>
+ </div>
+ <div style="height:20px"></div>
+</div>
+
+<!-- INSIGHTS -->
+<div id="screen-insights" class="screen">
+ <div class="page-top">
+  <div class="page-title">Insights 📊</div>
+  <div class="page-sub">Your patterns · last 7 days</div>
+ </div>
+
+ <div class="ins-stats">
+  <div class="ins-stat-card"><div class="ins-val" id="ins-avg-energy">—</div><div class="ins-lbl">Avg energy</div></div>
+  <div class="ins-stat-card"><div class="ins-val" id="ins-focus-hrs">0</div><div class="ins-lbl">Focus hrs</div></div>
+  <div class="ins-stat-card"><div class="ins-val" id="ins-streak">0</div><div class="ins-lbl">Streak 🔥</div></div>
+ </div>
+
+ <div class="chart-card">
+  <div class="chart-title">Energy & mood <span class="chart-badge">7 days</span></div>
+  <canvas id="chart-energy" height="170"></canvas>
+ </div>
+
+ <div class="chart-card">
+  <div class="chart-title">Focus minutes <span class="chart-badge">daily</span></div>
+  <canvas id="chart-focus" height="150"></canvas>
+ </div>
+
+ <div class="chart-card">
+  <div class="chart-title">Sleep hours <span class="chart-badge">nightly</span></div>
+  <canvas id="chart-sleep" height="150"></canvas>
+ </div>
+
+ <!-- HEATMAP -->
+ <div class="heatmap-wrap">
+  <div class="chart-card" style="padding-bottom:14px">
+   <div class="chart-title">Check-in streak <span class="chart-badge">28 days</span></div>
+   <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:6px">
+    <span>4 weeks ago</span><span>Today</span>
+   </div>
+   <div class="heatmap-grid" id="heatmap-grid"></div>
+   <div style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--text3)">
+    <div style="width:12px;height:12px;border-radius:2px;background:var(--card2)"></div> No data
+    <div style="width:12px;height:12px;border-radius:2px;background:rgba(109,93,252,0.4);margin-left:8px"></div> Logged
+   </div>
+  </div>
+ </div>
+
+ <!-- BLOCKERS -->
+ <div style="padding:0 20px 20px">
+  <div class="section-title">Top blockers this week</div>
+  <div id="blocker-tags" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+ </div>
+</div>
+
+<!-- AI COACH -->
+<div id="screen-ai" class="screen" style="padding-bottom:140px">
+ <div class="ai-top">
+  <div class="ai-avatar">🧠</div>
+  <div>
+   <div class="ai-name">AI Focus Coach</div>
+   <div class="ai-status">● Online · knows your data · powered by Claude</div>
+  </div>
+ </div>
+
+ <div class="chat-pills" id="chat-pills">
+  <div class="chat-pill" onclick="quickPrompt('Why do I always feel low energy in the afternoon?')">Why low energy?</div>
+  <div class="chat-pill" onclick="quickPrompt('Give me a focus strategy for today based on my data')">Today\'s strategy</div>
+  <div class="chat-pill" onclick="quickPrompt('How can I sleep better? Look at my sleep data')">Sleep tips</div>
+  <div class="chat-pill" onclick="quickPrompt('I feel overwhelmed and anxious, what should I do right now?')">Overwhelmed</div>
+  <div class="chat-pill" onclick="quickPrompt('Build me a study schedule for this week')">Study schedule</div>
+  <div class="chat-pill" onclick="quickPrompt('What patterns do you see in my tracking data?')">My patterns</div>
+  <div class="chat-pill" onclick="quickPrompt('How many focus hours should I aim for daily?')">Focus goals</div>
+  <div class="chat-pill" onclick="quickPrompt('What are the best ways to beat procrastination?')">Beat procrastination</div>
+ </div>
+
+ <div class="chat-area" id="chat-area">
+  <div class="msg ai">
+   <div class="bubble">Hey! 👋 I'm your personal focus coach. I can see your energy logs, sleep data, focus sessions, and streaks — so my advice is built around your actual data, not generic tips. What's on your mind?</div>
+   <div class="msg-ts" id="ai-start-time"></div>
+  </div>
+ </div>
+
+ <div class="chat-bar">
+  <textarea class="chat-input" id="chat-inp" placeholder="Ask your coach anything…" rows="1" onkeydown="chatKey(event)" oninput="autoH(this)"></textarea>
+  <button class="chat-send-btn" onclick="sendChat()">↑</button>
+ </div>
+</div>
+
+<!-- PROFILE -->
+<div id="screen-profile" class="screen">
+ <div class="profile-hero">
+  <div id="profile-avatar-wrap"></div>
+  <div class="profile-name" id="profile-name-text">—</div>
+  <div class="profile-email" id="profile-email-text"></div>
+  <div class="badges-row" id="profile-badges"></div>
+ </div>
+
+ <div class="profile-stats">
+  <div class="p-stat"><div class="p-stat-val" id="ps-streak" style="color:var(--amber)">0</div><div class="p-stat-lbl">Streak 🔥</div></div>
+  <div class="p-stat"><div class="p-stat-val" id="ps-checkins" style="color:var(--teal)">0</div><div class="p-stat-lbl">Check-ins</div></div>
+  <div class="p-stat"><div class="p-stat-val" id="ps-focus" style="color:var(--coral)">0</div><div class="p-stat-lbl">Focus hrs</div></div>
+ </div>
+
+ <div class="settings-list">
+  <div class="section-title">Settings & Data</div>
+  <div class="setting-row" onclick="exportData()">
+   <div class="setting-icon">📤</div>
+   <div class="setting-text"><div class="t">Export my data</div><div class="s">Download all logs as JSON</div></div>
+   <div class="setting-right">›</div>
+  </div>
+  <div class="setting-row" onclick="clearAiHistory()">
+   <div class="setting-icon">🤖</div>
+   <div class="setting-text"><div class="t">Clear AI chat history</div><div class="s">Reset all conversations</div></div>
+   <div class="setting-right">›</div>
+  </div>
+  <div class="setting-row" onclick="clearData()">
+   <div class="setting-icon">🗑️</div>
+   <div class="setting-text"><div class="t">Clear all my data</div><div class="s">Removes all logs and resets app</div></div>
+   <div class="setting-right" style="color:var(--coral)">›</div>
+  </div>
+  <div class="section-title" style="margin-top:20px">About</div>
+  <div class="setting-row">
+   <div class="setting-icon">🧠</div>
+   <div class="setting-text"><div class="t">FocusFlow</div><div class="s">v2.0 · Built for curious minds</div></div>
+   <div class="setting-right">MIT</div>
+  </div>
+ </div>
+
+ <button class="signout-btn" onclick="doSignOut()">Sign out</button>
+ <div style="height:20px"></div>
+</div>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+ <div class="nav-inner">
+  <button class="nav-item active" id="nav-home" onclick="navTo('home')">
+   <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+   <span>Home</span>
+  </button>
+  <button class="nav-item" id="nav-checkin" onclick="navTo('checkin')">
+   <div class="nav-dot"></div>
+   <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+   <span>Check-in</span>
+  </button>
+  <button class="nav-item" id="nav-focus" onclick="navTo('focus');initFocusScreen()">
+   <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+   <span>Focus</span>
+  </button>
+  <button class="nav-item" id="nav-insights" onclick="navTo('insights');initInsights()">
+   <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+   <span>Insights</span>
+  </button>
+  <button class="nav-item" id="nav-ai" onclick="navTo('ai')">
+   <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+   <span>Coach</span>
+  </button>
+ </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero" style="max-width:100%;padding-top:7rem;">
-  <div class="hero-bg"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-content">
-    <div class="hero-badge"><span></span> Currently on internship · Week 3 of 12</div>
-    <h1>Intan Nur Habriah<br/>Binti Azizan</h1>
-    <p class="hero-role">Software Engineering IT Intern</p>
-    <div class="hero-meta">
-      <div class="hero-meta-item"><strong>1231301467</strong>Student ID</div>
-      <div class="hero-meta-item"><strong>HELP International School</strong>Host Company</div>
-      <div class="hero-meta-item"><strong>6 Apr – 5 Jul 2026</strong>Training Period</div>
-      <div class="hero-meta-item"><strong>MMU · </strong>Industrial Training</div>
-    </div>
-    <div class="hero-actions">
-      <a href="#timeline" class="btn-primary">View Logbook →</a>
-      <a href="#project" class="btn-outline">See Project</a>
-    </div>
-    <div class="school-badges">
-      <div class="school-badge"><div class="school-dot dot-purple"></div>Multimedia University · FCI</div>
-      <div class="school-badge"><div class="school-dot dot-teal"></div>HELP International School · EdTech</div>
-    </div>
-  </div>
-</section>
+<!-- MODALS -->
+<div class="modal-overlay" id="water-modal" onclick="closeModal('water-modal')">
+ <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-handle"></div>
+  <div class="modal-title">💧 Water tracker</div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Tap to fill each cup. Goal: 8 cups per day (≈2L).</p>
+  <div class="water-cups-grid" id="water-cups-grid"></div>
+  <div style="text-align:center;font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:16px"><span id="water-modal-count">0</span> / 8 cups</div>
+  <button class="btn-primary" onclick="closeModal('water-modal')">Done</button>
+ </div>
+</div>
 
-<hr class="divider" style="max-width:1060px;margin:0 auto;"/>
+<div class="modal-overlay" id="sleep-modal" onclick="closeModal('sleep-modal')">
+ <div class="modal" onclick="event.stopPropagation()">
+  <div class="modal-handle"></div>
+  <div class="modal-title">😴 Log sleep hours</div>
+  <p style="font-size:13px;color:var(--text2);margin-bottom:16px">How many hours did you sleep last night?</p>
+  <input type="number" id="sleep-modal-inp" min="0" max="24" step="0.5" placeholder="e.g. 7.5" style="font-size:28px;text-align:center;padding:20px;margin-bottom:16px">
+  <button class="btn-primary" onclick="saveSleepModal()">Save</button>
+ </div>
+</div>
 
-<!-- ABOUT -->
-<section id="about">
-  <p class="section-label">Background</p>
-  <h2 class="section-title">About My Internship</h2>
-  <div class="about-grid">
-    <div class="about-text">
-      <p>I'm interning at the EdTech Department of HELP International School as a Software Engineering IT Intern, contributing to a real-world school pickup management system called <strong style="color:var(--accent2)">Elevare</strong>.</p>
-      <p>The system uses Automatic Number Plate Recognition (ANPR) cameras to detect when parents arrive at the school, automatically notifying students to proceed to the pickup zone — eliminating the manual name-calling process during dismissal.</p>
-      <p>My day-to-day work spans mobile app development in React Native, backend integration with Node.js, database management with MySQL, and collaborating directly with A-Level student developers.</p>
-    </div>
-    <div>
-      <ul class="info-list">
-       
-        <li><span>Faculty Sup.</span><span>MMU Faculty of Computing and Informatics</span></li>
-        <li><span>Duration</span><span>3 months · 12 weeks</span></li>
-        <li><span>Tech Stack</span><span>React Native, Expo, Node.js, MySQL, Socket.IO, SendGrid</span></li>
-        <li><span>Focus</span><span>Mobile Development, Backend Integration, OTP Auth, APK Deployment</span></li>
-      </ul>
-    </div>
-  </div>
-</section>
+<!-- LEVEL UP OVERLAY -->
+<div class="levelup-overlay" id="levelup-overlay">
+ <div class="levelup-card">
+  <div class="levelup-emoji">🎉</div>
+  <div class="levelup-title">Level Up!</div>
+  <div class="levelup-sub">You reached <strong id="levelup-name" style="color:var(--accent2)"></strong><br>Keep going, you're on fire! 🔥</div>
+  <button class="levelup-btn" onclick="document.getElementById('levelup-overlay').classList.remove('show')">Let's go →</button>
+ </div>
+</div>
 
-<hr class="divider" style="max-width:1060px;margin:0 auto;"/>
-
-<!-- STATS -->
-<section id="impact" style="padding-top:4rem;padding-bottom:4rem;">
-  <p class="section-label">Impact</p>
-  <h2 class="section-title">By the Numbers</h2>
-  <div class="stats-grid">
-    <div class="stat-card"><span class="stat-num">95.7%</span><p class="stat-label">Students believe system improves dismissal</p></div>
-    <div class="stat-card"><span class="stat-num">6</span><p class="stat-label">Development Phases Planned (Roadmap)</p></div>
-    <div class="stat-card"><span class="stat-num">3</span><p class="stat-label">Weeks Completed (ongoing)</p></div>
-  </div>
-</section>
-
-<hr class="divider" style="max-width:1060px;margin:0 auto;"/>
-
-<!-- PROJECT -->
-<section id="project">
-  <p class="section-label">Main Project</p>
-  <h2 class="section-title">Elevare · ANPR School Pickup System</h2>
-  <p class="section-sub">A smart dismissal management platform for HELP International School</p>
-  <div style="margin-top:2.5rem;">
-    <div class="project-card">
-      <div class="project-tag">React Native · Node.js · MySQL · Socket.IO</div>
-      <h3 class="project-title">Elevare — Automatic Number Plate Recognition Pickup App</h3>
-      <p class="project-desc">
-        Elevare is an ANPR-powered school dismissal system that replaces manual name-calling with automated parent detection. When a camera reads a car's plate at the school entrance, it triggers a real-time push notification to the student's device to proceed to the pickup zone. The system includes a mobile app for students, a backend server handling plate-to-student matching, push notifications via Expo, OTP-based login using school emails, and a live foyer display board showing student names by lane.
-      </p>
-      <div style="margin-bottom:1.25rem;">
-        <p style="font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);font-weight:600;margin-bottom:0.6rem;">My Contributions</p>
-        <ul style="color:var(--muted);font-size:0.87rem;display:flex;flex-direction:column;gap:0.4rem;padding-left:1rem;">
-          <li>Implemented login with school email authentication</li>
-          <li>Built and improved user profile page UI</li>
-          <li>Added logout functionality</li>
-          <li>Proposed & researched OTP authentication via SMTP / SendGrid</li>
-          <li>Researched APK build & deployment via Expo EAS</li>
-          <li>Explored Socket.IO real-time communication between camera and app</li>
-          <li>Troubleshot email server configuration for secure OTP delivery</li>
-        </ul>
-      </div>
-      <div class="tech-pills">
-        <span class="pill">React Native</span>
-        <span class="pill">Expo</span>
-        <span class="pill">Node.js</span>
-        <span class="pill">MySQL</span>
-        <span class="pill">Socket.IO</span>
-        <span class="pill">SendGrid</span>
-        <span class="pill">AsyncStorage</span>
-        <span class="pill">Expo Push Notifications</span>
-        <span class="pill">EAS Build</span>
-        <span class="pill">react-native-svg</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider" style="max-width:1060px;margin:0 auto;"/>
-
-<!-- TIMELINE -->
-<section id="timeline">
-  <p class="section-label">Weekly Logbook</p>
-  <h2 class="section-title">Internship Timeline</h2>
-  <p class="section-sub">A week-by-week record of tasks, learnings and reflections</p>
-  <div class="timeline" style="margin-top:3rem;">
-
-    <!-- WEEK 1 -->
-    <div class="tl-week">
-      <div class="tl-dot"></div>
-      <p class="tl-week-label">Week 1 · 6 April – 10 April 2026</p>
-      <h3 class="tl-week-title">Onboarding & First Features</h3>
-      <div class="tl-days">
-        <div class="tl-day"><span class="tl-day-date">Mon 6 Apr</span><span class="tl-day-text">HR briefing by Farah at 8:30am · Assisted A-Level students with mobile app development (1:35pm)</span></div>
-        <div class="tl-day"><span class="tl-day-date">Tue 7 Apr</span><span class="tl-day-text">Reviewed and studied the assigned project: ANPR · Understanding overall flow and project objectives</span></div>
-        <div class="tl-day"><span class="tl-day-date">Wed 8 Apr</span><span class="tl-day-text">Implemented login feature using school email · Meeting with A-Level students to review project progress</span></div>
-        <div class="tl-day"><span class="tl-day-date">Thu 9 Apr</span><span class="tl-day-text">Successfully implemented logout button functionality · Improved user interface of the profile page</span></div>
-        <div class="tl-day"><span class="tl-day-date">Fri 10 Apr</span><span class="tl-day-text">Discussed improvements for the notification feature in the system</span></div>
-      </div>
-      <div class="tl-reflection">
-        <strong>Problem:</strong> Difficulty understanding existing project structure as system was already developed.<br/>
-        <strong>Learned:</strong> Gained better understanding of React Native mobile app development · Improved debugging skills.<br/>
-      </div>
-    </div>
-
-    <!-- WEEK 2 -->
-    <div class="tl-week" style="animation-delay:0.1s;">
-      <div class="tl-dot"></div>
-      <p class="tl-week-label">Week 2 · 13 April – 17 April 2026</p>
-      <h3 class="tl-week-title">OTP & Backend Integration</h3>
-      <div class="tl-days">
-        <div class="tl-day"><span class="tl-day-date">Mon 13 Apr</span><span class="tl-day-text">Proposed OTP feature for login security · Assigned to explore APK generation for deployment</span></div>
-        <div class="tl-day"><span class="tl-day-date">Tue 14 Apr</span><span class="tl-day-text">Researched OTP implementation using school email server (not personal Gmail)</span></div>
-        <div class="tl-day"><span class="tl-day-date">Wed 15 Apr</span><span class="tl-day-text">Studied how mobile app connects to socket server for real-time communication · Queried full user list from DB</span></div>
-        <div class="tl-day"><span class="tl-day-date">Thu 16 Apr</span><span class="tl-day-text">Reviewed spreadsheet containing student data (names, car plates) — awaiting updated version</span></div>
-        <div class="tl-day"><span class="tl-day-date">Fri 17 Apr</span><span class="tl-day-text">Troubleshot email server configuration · Tried SMTP + SendGrid with existing API key · Explored new ANPR school email account</span></div>
-      </div>
-      <div class="tl-reflection">
-        <strong>Problem:</strong> Difficulty setting up OTP · SMTP config issues · Email server restrictions · SendGrid sender domain not verified (landing in junk).<br/>
-        <strong>Learned:</strong> How OTP authentication works via SMTP and third-party services · Improved API troubleshooting skills.<br/>
-        
-      </div>
-    </div>
-
-    <!-- WEEK 3 placeholder -->
-    <div class="tl-week" style="animation-delay:0.2s;opacity:0.55;">
-      <div class="tl-dot" style="background:var(--muted);"></div>
-      <p class="tl-week-label">Week 3 · 20 April – 24 April 2026</p>
-      <h3 class="tl-week-title">In Progress…</h3>
-      <div class="tl-days">
-        <div class="tl-day"><span class="tl-day-date">This week</span><span class="tl-day-text">Continuing ANPR data flow testing · Awaiting updated student database · SendGrid domain verification follow-up</span></div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<hr class="divider" style="max-width:1060px;margin:0 auto;"/>
-
-
-<!-- ROADMAP -->
-<section id="roadmap">
-  <p class="section-label">Product Roadmap</p>
-  <h2 class="section-title">Elevare's Phases</h2>
-  <p class="section-sub">From initial concept to multi-school expansion</p>
-  <div class="roadmap-grid">
-    <div class="roadmap-phase done">
-      <div class="roadmap-num">Phase 1</div>
-      <div class="roadmap-dot"></div>
-      <div class="roadmap-label">Formation of idea &amp; app concept</div>
-    </div>
-    <div class="roadmap-phase done">
-      <div class="roadmap-num">Phase 2</div>
-      <div class="roadmap-dot"></div>
-      <div class="roadmap-label">Development of prototype</div>
-    </div>
-    <div class="roadmap-phase active">
-      <div class="roadmap-num">Phase 3 ← Now</div>
-      <div class="roadmap-dot" style="background:var(--accent);animation:pulse 2s infinite;"></div>
-      <div class="roadmap-label">Launch of prototype</div>
-    </div>
-    <div class="roadmap-phase future">
-      <div class="roadmap-num">Phase 4</div>
-      <div class="roadmap-dot"></div>
-      <div class="roadmap-label">Launch of functional app</div>
-    </div>
-    <div class="roadmap-phase future">
-      <div class="roadmap-num">Phase 5</div>
-      <div class="roadmap-dot"></div>
-      <div class="roadmap-label">New CCTV cameras at school entrance</div>
-    </div>
-    <div class="roadmap-phase future">
-      <div class="roadmap-num">Phase 6</div>
-      <div class="roadmap-dot"></div>
-      <div class="roadmap-label">Expansion to sister schools &amp; international schools</div>
-    </div>
-  </div>
-</section>
-
-<hr class="divider" style="max-width:1060px;margin:0 auto;"/>
-
-<!-- SKILLS -->
-<section id="skills">
-  <p class="section-label">What I'm Learning</p>
-  <h2 class="section-title">Key Learnings</h2>
-  <div class="skills-grid">
-    <div class="skill-card"><div class="skill-icon">📱</div><h4 class="skill-title">React Native & Expo</h4><p class="skill-desc">Building cross-platform mobile apps, managing navigation, and deploying APKs via EAS Build.</p></div>
-    <div class="skill-card"><div class="skill-icon">🔑</div><h4 class="skill-title">OTP Authentication</h4><p class="skill-desc">Implementing secure login with SMTP and SendGrid, handling email server configuration and domain verification.</p></div>
-    <div class="skill-card"><div class="skill-icon">🔌</div><h4 class="skill-title">Real-time with Socket.IO</h4><p class="skill-desc">Understanding how camera data flows through a socket server to the mobile app in real time.</p></div>
-    <div class="skill-card"><div class="skill-icon">🗄️</div><h4 class="skill-title">MySQL & Backend</h4><p class="skill-desc">Querying a live school database, understanding table relationships for users, plates, and students.</p></div>
-    <div class="skill-card"><div class="skill-icon">🚀</div><h4 class="skill-title">Push Notifications</h4><p class="skill-desc">Leveraging expo-notifications and Expo push tokens for targeted per-student notifications.</p></div>
-    <div class="skill-card"><div class="skill-icon">🤝</div><h4 class="skill-title">Stakeholder Collaboration</h4><p class="skill-desc">Working directly with supervisors, A-Level students, and school staff to gather requirements and iterate.</p></div>
-  </div>
-</section>
-
-<hr class="divider" style="max-width:1060px;margin:0 auto;"/>
-
-<!-- REFLECTIONS -->
-<section id="reflections">
-  <p class="section-label">Personal Growth</p>
-  <h2 class="section-title">Reflections</h2>
-  <div class="reflection-grid">
-    <div class="reflection-card">
-      <div class="reflection-head">
-        <div class="reflection-icon">⚡</div>
-        <h4 class="reflection-title">Challenges Faced</h4>
-      </div>
-      <p class="reflection-body">Joining an already-developed codebase was initially difficult — understanding the existing structure, conventions and logic took focused effort in Week 1. In Week 2, SMTP and email server restrictions blocked OTP implementation, requiring exploration of multiple solutions including SendGrid domain authentication.</p>
-    </div>
-    <div class="reflection-card">
-      <div class="reflection-head">
-        <div class="reflection-icon">💡</div>
-        <h4 class="reflection-title">Lessons Learned</h4>
-      </div>
-      <p class="reflection-body">Reading existing code before making changes saves significant debugging time. When one solution fails (personal SMTP), pivoting systematically to alternatives (SendGrid, school email server) is more productive than persisting with a blocked approach. Documentation and asking targeted questions to supervisors is key.</p>
-    </div>
-    <div class="reflection-card">
-      <div class="reflection-head">
-        <div class="reflection-icon">🎯</div>
-        <h4 class="reflection-title">What I'm Proud Of</h4>
-      </div>
-      <p class="reflection-body">Independently proposing the OTP security feature (it wasn't originally planned), contributing real production features to the login system in my first week, and actively mentoring A-Level students on app development concepts.</p>
-    </div>
-    <div class="reflection-card">
-      <div class="reflection-head">
-        <div class="reflection-icon">🗺️</div>
-        <h4 class="reflection-title">What's Ahead</h4>
-      </div>
-      <p class="reflection-body">Finishing OTP integration once SendGrid domain is verified · Connecting the updated student database once received from supervisors · Testing the full ANPR camera → plate detection → push notification pipeline end-to-end.</p>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <p style="margin-bottom:0.5rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--text);">Intan Nur Habriah Binti Azizan</p>
-  <p>Industrial Training · CPT6216 · Multimedia University · <a href="mailto:">FCI Cyberjaya</a></p>
-  <p style="margin-top:0.75rem;">HELP International School · 6 Apr – 5 Jul 2026</p>
-  <p style="margin-top:1rem;font-size:0.75rem;opacity:0.5;">Built as internship portfolio · Updated weekly</p>
-</footer>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-  // Theme toggle
-  const root = document.documentElement;
-  const btn = document.getElementById('themeBtn');
-  let isLight = false;
+// ═══════════════════════════════════
+//  STATE & CONSTANTS
+// ═══════════════════════════════════
+const LEVELS = [
+  {min:0,name:'Beginner'},{min:100,name:'Consistent'},{min:300,name:'Focused'},
+  {min:600,name:'Disciplined'},{min:1000,name:'Sharp'},{min:1500,name:'Relentless'},
+  {min:2200,name:'Elite'},{min:3000,name:'Mind Master'},{min:4000,name:'Flow State'},
+  {min:5500,name:'Legend'}
+];
+const QUOTES = [
+  {text:"The secret of getting ahead is getting started.",auth:"Mark Twain"},
+  {text:"You don't have to see the whole staircase, just take the first step.",auth:"Martin Luther King Jr."},
+  {text:"Energy and persistence conquer all things.",auth:"Benjamin Franklin"},
+  {text:"Small steps every day lead to big change over time.",auth:"Anonymous"},
+  {text:"Your future self is watching you right now through memories.",auth:"Aubrey de Grey"},
+  {text:"Focus is a matter of deciding what things you're not going to do.",auth:"John Carmack"},
+  {text:"A year from now you'll wish you had started today.",auth:"Karen Lamb"},
+  {text:"The only way to do great work is to love what you do.",auth:"Steve Jobs"},
+  {text:"Don't count the days, make the days count.",auth:"Muhammad Ali"},
+  {text:"Success is the sum of small efforts repeated day in and day out.",auth:"Robert Collier"},
+  {text:"Be so good they can't ignore you.",auth:"Steve Martin"},
+  {text:"You are what you repeatedly do.",auth:"Aristotle"},
+  {text:"Sleep is the best meditation.",auth:"Dalai Lama"},
+  {text:"Your body is your most priceless possession — take care of it.",auth:"Jack LaLanne"},
+  {text:"Lack of direction, not lack of time, is the problem.",auth:"Zig Ziglar"},
+];
+const WEEKLY_CHALLENGES = [
+  {label:"Log energy every day",xp:30,id:'daily_energy'},
+  {label:"Complete 3 focus sessions",xp:40,id:'focus_3'},
+  {label:"Drink 8 cups of water in a day",xp:20,id:'water_8'},
+  {label:"Sleep 7+ hours two nights in a row",xp:35,id:'sleep_7x2'},
+  {label:"Log zero blockers for a full day",xp:25,id:'clean_day'},
+];
 
-  // Default: dark mode (night)
-  btn.textContent = '☀️ Day';
+let S = loadState();
+let currentUser = null;
+let isDemo = false;
 
-  function toggleTheme() {
-    isLight = !isLight;
-    if (isLight) {
-      root.classList.add('light');
-      btn.textContent = '🌙 Night';
-    } else {
-      root.classList.remove('light');
-      btn.textContent = '☀️ Day';
+function loadState(){
+  try{ return JSON.parse(localStorage.getItem('ff2_state'))||newState(); }catch{ return newState(); }
+}
+function newState(){
+  return {
+    profile:null, checkins:[], sessions:[], water:{}, sleep:{},
+    xp:0, chatHistory:[], weekChallenge:{ week:weekKey(), done:{} }
+  };
+}
+function save(){
+  localStorage.setItem('ff2_state',JSON.stringify(S));
+  if(currentUser && !isDemo) syncToFirestore();
+}
+function weekKey(){ const d=new Date(); return d.getFullYear()+'-W'+String(Math.ceil((d.getDate()-d.getDay()+10)/7)).padStart(2,'0'); }
+function todayKey(){ return new Date().toISOString().slice(0,10); }
+function fmtTime(d){ return d.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'}); }
+function fmtDate(d){ return d.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'}); }
+
+// ═══════════════════════════════════
+//  FIREBASE AUTH
+// ═══════════════════════════════════
+function waitFirebase(cb){
+  if(window._firebaseReady) cb();
+  else window.addEventListener('firebaseReady', cb, {once:true});
+}
+
+waitFirebase(()=>{
+  window._onAuthStateChanged(window._auth, async(user)=>{
+    document.getElementById('screen-splash').style.display='none';
+    if(user){
+      currentUser = user;
+      await loadFromFirestore();
+      if(!S.profile) showOnboard();
+      else{ showApp(); initHomeData(); }
+    } else if(!isDemo){
+      showScreen('auth');
     }
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  });
+});
+
+async function signInGoogle(){
+  try{
+    await window._signInWithPopup(window._auth, window._provider);
+  } catch(e){
+    showToast('Sign-in failed. Try again.');
+    console.error(e);
+  }
+}
+
+function startDemo(){
+  isDemo = true;
+  if(!S.profile) showOnboard();
+  else{ showApp(); initHomeData(); }
+}
+
+async function doSignOut(){
+  if(!confirm('Sign out?')) return;
+  if(!isDemo) await window._signOut(window._auth);
+  currentUser = null; isDemo = false;
+  S = newState(); save();
+  hideApp();
+  showScreen('auth');
+}
+
+async function syncToFirestore(){
+  if(!currentUser||!window._db) return;
+  try{
+    const ref = window._doc(window._db,'users',currentUser.uid);
+    await window._setDoc(ref,{data:JSON.stringify(S),uid:currentUser.uid,updated:window._serverTimestamp()},{merge:true});
+  }catch(e){ console.warn('Sync error',e); }
+}
+
+async function loadFromFirestore(){
+  if(!currentUser||!window._db) return;
+  try{
+    const ref = window._doc(window._db,'users',currentUser.uid);
+    const snap = await window._getDoc(ref);
+    if(snap.exists()){
+      const remote = JSON.parse(snap.data().data||'null');
+      if(remote) S = remote;
+    }
+  }catch(e){ console.warn('Load error',e); }
+}
+
+// ═══════════════════════════════════
+//  SCREEN MANAGEMENT
+// ═══════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('screen-'+id);
+  if(el) el.classList.add('active');
+}
+function showApp(){
+  document.getElementById('main-nav').style.display='block';
+  navTo('home');
+}
+function hideApp(){
+  document.getElementById('main-nav').style.display='none';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+}
+function showOnboard(){ showScreen('onboard'); }
+
+function navTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const nb = document.getElementById('nav-'+id);
+  if(nb) nb.classList.add('active');
+  if(id==='home') initHomeData();
+  if(id==='insights') initInsights();
+  if(id==='profile') initProfile();
+  if(id==='ai') document.getElementById('ai-start-time').textContent=fmtTime(new Date());
+  if(id==='checkin') document.getElementById('ci-date-label').textContent='Today · '+fmtDate(new Date());
+}
+
+// ═══════════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════════
+let obStep=1, obD={name:'',goal:'',peak:''};
+function pickOne(el,groupId){
+  document.querySelectorAll('#'+groupId+' .chip').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function obNext(step){
+  if(step===1){
+    const n=document.getElementById('ob-name').value.trim();
+    if(!n){showToast('Enter your name first');return;}
+    obD.name=n;
+  } else if(step===2){
+    const s=document.querySelector('#ob-goals .chip.selected');
+    if(!s){showToast('Pick a goal');return;}
+    obD.goal=s.dataset.v;
+  } else if(step===3){
+    const s=document.querySelector('#ob-peak .chip.selected');
+    if(!s){showToast('Pick your peak time');return;}
+    obD.peak=s.dataset.v;
+    finishOnboard(); return;
+  }
+  document.getElementById('ob'+step).classList.remove('active');
+  document.getElementById('ob'+(step+1)).classList.add('active');
+  obStep=step+1;
+}
+function finishOnboard(){
+  S.profile={name:obD.name,goal:obD.goal,peak:obD.peak,joined:Date.now()};
+  if(currentUser){ S.profile.photoURL=currentUser.photoURL; S.profile.email=currentUser.email; }
+  addXP(50,'Welcome bonus'); save();
+  showApp(); initHomeData();
+  showToast('Welcome to FocusFlow, '+obD.name+'! 🎉');
+}
+
+// ═══════════════════════════════════
+//  HOME
+// ═══════════════════════════════════
+function initHomeData(){
+  if(!S.profile) return;
+  const today = todayKey();
+  const hr = new Date().getHours();
+  const greet = hr<5?'Good night':hr<12?'Good morning':hr<17?'Good afternoon':hr<21?'Good evening':'Good night';
+  document.getElementById('home-greeting').textContent = greet+' '+S.profile.name+' ✨';
+  document.getElementById('home-date').textContent = fmtDate(new Date());
+
+  // Avatar
+  const avatarWrap = document.getElementById('home-avatar-wrap');
+  if(S.profile.photoURL){
+    avatarWrap.innerHTML=`<img class="home-avatar" src="${S.profile.photoURL}" onclick="navTo('profile')" alt="Profile">`;
+  } else {
+    avatarWrap.innerHTML=`<div class="home-avatar-placeholder" onclick="navTo('profile')">${(S.profile.name||'?')[0].toUpperCase()}</div>`;
   }
 
-  // Restore saved preference
-  if (localStorage.getItem('theme') === 'light') {
-    isLight = true;
-    root.classList.add('light');
-    btn.textContent = '🌙 Night';
+  // Quote
+  const q = QUOTES[new Date().getDate() % QUOTES.length];
+  document.getElementById('daily-quote').textContent = '"'+q.text+'"';
+  document.getElementById('daily-author').textContent = '— '+q.auth;
+
+  // XP
+  renderXP();
+
+  // Streaks
+  document.getElementById('home-streak').textContent = calcStreak();
+  const w = S.water[today]||0;
+  document.getElementById('home-water').textContent = w+'/8';
+  const focusMins = (S.sessions||[]).filter(s=>s.date===today).reduce((a,b)=>a+b.mins,0);
+  document.getElementById('home-focus-mins').textContent = focusMins;
+
+  // Stat cards
+  const ci = S.checkins.find(c=>c.date===today);
+  if(ci){
+    document.getElementById('stat-energy').textContent = ci.energy+'/10';
+    document.getElementById('mpfill-energy').style.width=(ci.energy*10)+'%';
+    const ms = {terrible:'😫',bad:'😕',okay:'😐',good:'🙂',great:'🤩'};
+    document.getElementById('stat-mood').textContent = ms[ci.mood]||'—';
+    document.getElementById('mpfill-mood').style.width={terrible:20,bad:40,okay:60,good:80,great:100}[ci.mood]+'%';
+  }
+  const sl = S.sleep[today];
+  if(sl){
+    document.getElementById('stat-sleep').textContent = sl+'h';
+    document.getElementById('mpfill-sleep').style.width=Math.min(100,sl/9*100)+'%';
+  }
+  document.getElementById('stat-xp-total').textContent = S.xp||0;
+  document.getElementById('mpfill-xp').style.width = Math.min(100,(S.xp||0)/100*100)+'%';
+
+  // Check-in banner
+  const banner = document.getElementById('home-ci-banner');
+  if(ci){
+    banner.classList.add('done');
+    banner.querySelector('.checkin-banner-title').textContent='✅ Check-in complete!';
+    banner.querySelector('.checkin-banner-sub').textContent='Energy: '+ci.energy+'/10 · Mood: '+ci.mood;
+    document.getElementById('nav-checkin').classList.remove('has-notif');
+  } else {
+    banner.classList.remove('done');
+    banner.querySelector('.checkin-banner-title').textContent='📋 Log today\'s check-in';
+    banner.querySelector('.checkin-banner-sub').textContent='Track energy, mood & blockers · +20 XP';
+    document.getElementById('nav-checkin').classList.add('has-notif');
   }
 
-  // Animate bars on scroll
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.bar-fill').forEach(b => {
-          const w = b.style.width; b.style.width = '0';
-          setTimeout(() => { b.style.width = w; }, 100);
-        });
-      }
+  // Weekly challenges
+  renderChallenges();
+
+  // Recent logs
+  renderHomeLogs();
+}
+
+function renderXP(){
+  const xp = S.xp||0;
+  let lvl=0;
+  for(let i=0;i<LEVELS.length;i++){ if(xp>=LEVELS[i].min) lvl=i; }
+  const nextLvl = LEVELS[lvl+1];
+  const curMin = LEVELS[lvl].min;
+  const nextMin = nextLvl?nextLvl.min:curMin+1000;
+  const pct = Math.min(100,Math.round((xp-curMin)/(nextMin-curMin)*100));
+  document.getElementById('xp-level').textContent = lvl+1;
+  document.getElementById('xp-level-name').textContent = LEVELS[lvl].name;
+  document.getElementById('xp-cur').textContent = xp-curMin;
+  document.getElementById('xp-next').textContent = nextMin-curMin;
+  document.getElementById('xp-fill').style.width = pct+'%';
+}
+
+function addXP(amount, reason){
+  const before = S.xp||0;
+  S.xp = before+amount;
+  let lvlBefore=0, lvlAfter=0;
+  for(let i=0;i<LEVELS.length;i++){ if(before>=LEVELS[i].min) lvlBefore=i; if(S.xp>=LEVELS[i].min) lvlAfter=i; }
+  if(lvlAfter>lvlBefore){
+    setTimeout(()=>{
+      document.getElementById('levelup-name').textContent='Level '+(lvlAfter+1)+' — '+LEVELS[lvlAfter].name;
+      document.getElementById('levelup-overlay').classList.add('show');
+    },600);
+  }
+}
+
+function renderChallenges(){
+  const today = todayKey();
+  if(S.weekChallenge.week!==weekKey()){ S.weekChallenge={week:weekKey(),done:{}}; }
+  // Auto-check challenges
+  const ci = S.checkins.find(c=>c.date===today);
+  const w = S.water[today]||0;
+  const sessions = (S.sessions||[]).filter(s=>s.date===today);
+  const sevenDaysSessions = (S.sessions||[]).filter(s=>{const d=new Date(s.date);return (Date.now()-d.getTime())<7*86400000;});
+  if(ci) S.weekChallenge.done.daily_energy=true;
+  if(sevenDaysSessions.length>=3) S.weekChallenge.done.focus_3=true;
+  if(w>=8) S.weekChallenge.done.water_8=true;
+  if(ci&&parseFloat(S.sleep[today])>=7) S.weekChallenge.done.sleep_7x2=true;
+  if(ci&&(!ci.blockers||ci.blockers.length===0)) S.weekChallenge.done.clean_day=true;
+
+  const el = document.getElementById('challenge-tasks');
+  el.innerHTML = WEEKLY_CHALLENGES.map(ch=>`
+   <div class="challenge-task" onclick="toggleChallenge('${ch.id}',${ch.xp})">
+    <div class="task-check ${S.weekChallenge.done[ch.id]?'done':''}"></div>
+    <div class="task-text">${ch.label}</div>
+    <div class="task-xp">+${ch.xp} XP</div>
+   </div>`).join('');
+}
+
+function toggleChallenge(id,xp){
+  if(S.weekChallenge.done[id]) return;
+  S.weekChallenge.done[id]=true;
+  addXP(xp,'Challenge: '+id);
+  save(); renderChallenges(); renderXP();
+  showToast('+'+xp+' XP earned! 🎯');
+}
+
+function renderHomeLogs(){
+  const el = document.getElementById('home-logs');
+  const recent = [...S.checkins].reverse().slice(0,5);
+  if(!recent.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">No check-ins yet.<br>Tap the banner above to start.</div></div>';
+    return;
+  }
+  const today=todayKey();
+  const moodEmoji={terrible:'😫',bad:'😕',okay:'😐',good:'🙂',great:'🤩'};
+  el.innerHTML=recent.map(ci=>`
+   <div class="log-item">
+    <div class="log-mood-icon">${moodEmoji[ci.mood]||'😐'}</div>
+    <div style="flex:1">
+     <div class="log-text-title">${ci.date===today?'Today':ci.date}</div>
+     <div class="log-text-sub">Energy ${ci.energy}/10${ci.sleep?' · Sleep '+ci.sleep+'h':''}${ci.blockers&&ci.blockers.length?' · '+ci.blockers.slice(0,2).join(', '):''}</div>
+    </div>
+    <div class="log-right-val">
+     <div class="log-val-num">⚡${ci.energy}</div>
+     <div class="log-val-sub">${ci.mood}</div>
+    </div>
+   </div>`).join('');
+}
+
+// ═══════════════════════════════════
+//  CHECK-IN
+// ═══════════════════════════════════
+let selectedMood='';
+function pickMood(el){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected'); selectedMood=el.dataset.m;
+}
+function onEnergySlide(v){
+  document.getElementById('energy-big').textContent=v;
+  const colors=['#f87171','#fb923c','#fbbf24','#a3e635','#34d399'];
+  document.getElementById('energy-big').style.color=colors[Math.ceil(v/2)-1]||'var(--accent2)';
+}
+function saveCheckin(){
+  if(!selectedMood){showToast('Pick your mood first');return;}
+  const energy=parseInt(document.getElementById('energy-slider').value);
+  const sleep=parseFloat(document.getElementById('ci-sleep').value)||null;
+  const note=document.getElementById('ci-note').value.trim();
+  const blockers=[...document.querySelectorAll('#ci-blockers .tchip.on')].map(c=>c.textContent.trim());
+  const wins=[...document.querySelectorAll('#ci-wins .tchip.on')].map(c=>c.textContent.trim());
+  const today=todayKey();
+  const isFirst=!S.checkins.find(c=>c.date===today);
+  const ci={date:today,mood:selectedMood,energy,sleep,note,blockers,wins,ts:Date.now()};
+  const idx=S.checkins.findIndex(c=>c.date===today);
+  if(idx>=0) S.checkins[idx]=ci; else S.checkins.push(ci);
+  if(sleep) S.sleep[today]=sleep;
+  if(isFirst){ addXP(20,'Daily check-in'); }
+  if(wins.length) addXP(wins.length*5,'Wins logged');
+  save(); showToast('✅ Saved! +20 XP');
+  setTimeout(()=>navTo('home'),700);
+}
+
+// ═══════════════════════════════════
+//  FOCUS TIMER
+// ═══════════════════════════════════
+let tDur=25*60,tLeft=25*60,tInterval=null,tRunning=false;
+const CIRC=2*Math.PI*96;
+
+function setDur(min,el){
+  if(tRunning) return;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  tDur=min*60; tLeft=tDur; updateTimerDisp();
+}
+function setCustomDur(){
+  const m=prompt('Enter minutes (5–180):');
+  const mins=parseInt(m);
+  if(!mins||mins<5||mins>180){showToast('Enter 5–180 minutes');return;}
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+  tDur=mins*60; tLeft=tDur; updateTimerDisp();
+  showToast('Timer set to '+mins+' min');
+}
+function toggleTimer(){ tRunning?pauseTimer():startFocus(); }
+function startFocus(){
+  tRunning=true;
+  document.getElementById('play-btn').textContent='⏸';
+  document.getElementById('timer-lbl').textContent='Focusing…';
+  tInterval=setInterval(()=>{ tLeft--; updateTimerDisp(); if(tLeft<=0) finishSession(); },1000);
+}
+function pauseTimer(){
+  tRunning=false; clearInterval(tInterval);
+  document.getElementById('play-btn').textContent='▶';
+  document.getElementById('timer-lbl').textContent='Paused';
+}
+function resetTimer(){
+  pauseTimer(); tLeft=tDur;
+  document.getElementById('timer-lbl').textContent='Ready';
+  updateTimerDisp();
+}
+function doneEarly(){
+  const elapsed=Math.round((tDur-tLeft)/60);
+  if(elapsed<1){showToast('Focus for at least 1 minute');return;}
+  finishSession(elapsed);
+}
+function finishSession(overrideMins){
+  pauseTimer();
+  const mins=overrideMins||Math.round(tDur/60);
+  const label=document.getElementById('session-name').value.trim()||'Focus session';
+  const session={date:todayKey(),label,mins,ts:Date.now()};
+  if(!S.sessions) S.sessions=[];
+  S.sessions.push(session);
+  addXP(Math.round(mins/5)*5,'Focus session');
+  save();
+  showToast('🎯 '+mins+' min session saved! +'+Math.round(mins/5)*5+' XP');
+  tLeft=tDur;
+  document.getElementById('timer-lbl').textContent='Done ✓';
+  document.getElementById('play-btn').textContent='▶';
+  updateTimerDisp(); renderFocusSessions();
+}
+function updateTimerDisp(){
+  const m=String(Math.floor(tLeft/60)).padStart(2,'0');
+  const s=String(tLeft%60).padStart(2,'0');
+  document.getElementById('timer-disp').textContent=m+':'+s;
+  const pct=1-tLeft/tDur;
+  document.getElementById('timer-ring').style.strokeDashoffset=CIRC*(1-pct);
+}
+function initFocusScreen(){ renderFocusSessions(); updateTimerDisp(); }
+function renderFocusSessions(){
+  const today=todayKey();
+  const sessions=(S.sessions||[]).filter(s=>s.date===today).reverse();
+  const el=document.getElementById('focus-sessions-list');
+  if(!sessions.length){
+    el.innerHTML='<div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">No sessions yet.<br>Start your first focus block.</div></div>';
+    return;
+  }
+  el.innerHTML=sessions.map(s=>`
+   <div class="session-row">
+    <div class="session-dot"></div>
+    <div class="session-name">${s.label}</div>
+    <div class="session-mins">${s.mins} min</div>
+   </div>`).join('');
+}
+
+// ═══════════════════════════════════
+//  INSIGHTS & CHARTS
+// ═══════════════════════════════════
+let charts={};
+function initInsights(){
+  const days=last7Days();
+  const labels=days.map(d=>new Date(d).toLocaleDateString('en',{weekday:'short'}));
+  const energyData=days.map(d=>{const c=S.checkins.find(x=>x.date===d);return c?c.energy:null;});
+  const moodData=days.map(d=>{const c=S.checkins.find(x=>x.date===d);return c?{terrible:2,bad:4,okay:6,good:8,great:10}[c.mood]:null;});
+  const focusData=days.map(d=>(S.sessions||[]).filter(s=>s.date===d).reduce((a,b)=>a+b.mins,0));
+  const sleepData=days.map(d=>S.sleep[d]||null);
+  const avgE=energyData.filter(Boolean);
+  document.getElementById('ins-avg-energy').textContent=avgE.length?(avgE.reduce((a,b)=>a+b,0)/avgE.length).toFixed(1):'—';
+  document.getElementById('ins-focus-hrs').textContent=((S.sessions||[]).filter(s=>days.includes(s.date)).reduce((a,b)=>a+b.mins,0)/60).toFixed(1);
+  document.getElementById('ins-streak').textContent=calcStreak();
+
+  const co={responsive:true,animation:false,plugins:{legend:{display:true,labels:{color:'#a89fc8',font:{size:11},boxWidth:12,padding:16}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#564f72',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#564f72',font:{size:11}}}}};
+  if(charts.energy) charts.energy.destroy();
+  charts.energy=new Chart(document.getElementById('chart-energy'),{type:'line',data:{labels,datasets:[
+    {label:'Energy',data:energyData,borderColor:'#6d5dfc',backgroundColor:'rgba(109,93,252,0.12)',tension:0.4,fill:true,pointBackgroundColor:'#6d5dfc',spanGaps:true,borderWidth:2},
+    {label:'Mood',data:moodData,borderColor:'#2dd4bf',tension:0.4,fill:false,pointBackgroundColor:'#2dd4bf',spanGaps:true,borderWidth:2}
+  ]},options:co});
+  if(charts.focus) charts.focus.destroy();
+  charts.focus=new Chart(document.getElementById('chart-focus'),{type:'bar',data:{labels,datasets:[{data:focusData,backgroundColor:'rgba(248,113,113,0.75)',borderRadius:8,label:'Minutes'}]},options:{...co,plugins:{...co.plugins,legend:{display:false}}}});
+  if(charts.sleep) charts.sleep.destroy();
+  charts.sleep=new Chart(document.getElementById('chart-sleep'),{type:'bar',data:{labels,datasets:[{data:sleepData,backgroundColor:'rgba(129,140,248,0.75)',borderRadius:8,label:'Hours'}]},options:{...co,plugins:{...co.plugins,legend:{display:false}}}});
+
+  // Heatmap
+  renderHeatmap();
+
+  // Blockers
+  const bc={};
+  S.checkins.filter(c=>days.includes(c.date)).forEach(ci=>(ci.blockers||[]).forEach(b=>{bc[b]=(bc[b]||0)+1;}));
+  const btags=document.getElementById('blocker-tags');
+  const sorted=Object.entries(bc).sort((a,b)=>b[1]-a[1]);
+  btags.innerHTML=sorted.length?sorted.map(([b,c])=>`<span class="badge badge-amber">${b} (${c}×)</span>`).join(''):'<div class="empty-text" style="color:var(--text3)">No blockers logged this week 🎉</div>';
+}
+
+function renderHeatmap(){
+  const grid=document.getElementById('heatmap-grid');
+  grid.innerHTML='';
+  for(let i=27;i>=0;i--){
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const key=d.toISOString().slice(0,10);
+    const hasCI=!!S.checkins.find(c=>c.date===key);
+    const ci=S.checkins.find(c=>c.date===key);
+    const intensity=ci?ci.energy/10:0;
+    const cell=document.createElement('div');
+    cell.className='heatmap-cell';
+    cell.style.background=hasCI?`rgba(109,93,252,${0.2+intensity*0.7})`:'';
+    cell.setAttribute('data-tip',d.toLocaleDateString('en',{month:'short',day:'numeric'})+(hasCI?' · E'+ci.energy:''));
+    grid.appendChild(cell);
+  }
+}
+
+// ═══════════════════════════════════
+//  AI COACH
+// ═══════════════════════════════════
+let chatHistory=S.chatHistory||[];
+function quickPrompt(text){ document.getElementById('chat-inp').value=text; sendChat(); }
+async function sendChat(){
+  const inp=document.getElementById('chat-inp');
+  const msg=inp.value.trim(); if(!msg) return;
+  inp.value=''; inp.style.height='';
+  appendMsg(msg,'user'); chatHistory.push({role:'user',content:msg});
+  const typing=appendTyping();
+  const today=todayKey();
+  const ci=S.checkins.find(c=>c.date===today);
+  const focusMins=(S.sessions||[]).filter(s=>s.date===today).reduce((a,b)=>a+b.mins,0);
+  const xp=S.xp||0; let lvl=0;
+  for(let i=0;i<LEVELS.length;i++) if(xp>=LEVELS[i].min) lvl=i;
+  const system=`You are a personal mind and focus coaching assistant in an app called FocusFlow. You have access to the user's real tracking data below. Be warm, direct, concise (under 130 words unless giving a plan). Use 1-2 emojis max. Always reference their actual data when relevant.
+
+USER: Name=${S.profile?.name}, Goal="${S.profile?.goal}", Peak="${S.profile?.peak}", Level ${lvl+1} (${LEVELS[lvl].name}), XP=${xp}, Streak=${calcStreak()} days.
+TODAY (${today}): ${ci?`Mood=${ci.mood}, Energy=${ci.energy}/10, Sleep=${ci.sleep||'not logged'}h, Blockers=${JSON.stringify(ci.blockers||[])}, Wins=${JSON.stringify(ci.wins||[])}`:'No check-in yet today.'}
+FOCUS TODAY: ${focusMins} mins.
+WATER: ${S.water[today]||0}/8 cups.
+RECENT 7 CHECK-INS: ${JSON.stringify(S.checkins.slice(-7).map(c=>({date:c.date,mood:c.mood,energy:c.energy,sleep:c.sleep,blockers:c.blockers})))}`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system,messages:chatHistory})});
+    const d=await r.json();
+    const reply=d.content?.[0]?.text||"I couldn't respond right now. Please try again.";
+    typing.remove(); appendMsg(reply,'ai');
+    chatHistory.push({role:'assistant',content:reply});
+    S.chatHistory=chatHistory.slice(-30); save();
+  } catch(e){
+    typing.remove(); appendMsg("Connection issue. Make sure you're online and try again.",'ai');
+  }
+}
+function appendMsg(text,role){
+  const area=document.getElementById('chat-area');
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  div.innerHTML=`<div class="bubble">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div class="msg-ts">${fmtTime(new Date())}</div>`;
+  area.appendChild(div); div.scrollIntoView({behavior:'smooth'}); return div;
+}
+function appendTyping(){
+  const area=document.getElementById('chat-area');
+  const div=document.createElement('div');
+  div.className='msg ai';
+  div.innerHTML='<div class="bubble typing-wrap"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  area.appendChild(div); div.scrollIntoView({behavior:'smooth'}); return div;
+}
+function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+function autoH(el){ el.style.height=''; el.style.height=Math.min(100,el.scrollHeight)+'px'; }
+
+// ═══════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════
+function initProfile(){
+  if(!S.profile) return;
+  const wrap=document.getElementById('profile-avatar-wrap');
+  if(S.profile.photoURL){
+    wrap.innerHTML=`<img class="profile-avatar-lg" src="${S.profile.photoURL}" alt="Avatar">`;
+  } else {
+    wrap.innerHTML=`<div class="profile-avatar-placeholder">${(S.profile.name||'?')[0].toUpperCase()}</div>`;
+  }
+  document.getElementById('profile-name-text').textContent=S.profile.name;
+  document.getElementById('profile-email-text').textContent=S.profile.email||(isDemo?'Demo mode':'');
+  const xp=S.xp||0; let lvl=0;
+  for(let i=0;i<LEVELS.length;i++) if(xp>=LEVELS[i].min) lvl=i;
+  const badges=document.getElementById('profile-badges');
+  const bs=[];
+  bs.push(`<span class="badge badge-purple">⚡ Lv${lvl+1} ${LEVELS[lvl].name}</span>`);
+  if(calcStreak()>=3) bs.push(`<span class="badge badge-amber">🔥 ${calcStreak()} day streak</span>`);
+  if(S.checkins.length>=10) bs.push(`<span class="badge badge-teal">✅ Consistent</span>`);
+  if((S.sessions||[]).length>=5) bs.push(`<span class="badge badge-coral">🎯 Focused</span>`);
+  badges.innerHTML=bs.join('');
+  document.getElementById('ps-streak').textContent=calcStreak();
+  document.getElementById('ps-checkins').textContent=S.checkins.length;
+  document.getElementById('ps-focus').textContent=((S.sessions||[]).reduce((a,b)=>a+b.mins,0)/60).toFixed(1);
+  if(document.getElementById('nav-profile')) document.getElementById('nav-profile').classList.add('active');
+}
+
+// ═══════════════════════════════════
+//  WATER MODAL
+// ═══════════════════════════════════
+function showWaterModal(){ renderWaterCups(); document.getElementById('water-modal').classList.add('open'); }
+function renderWaterCups(){
+  const today=todayKey(); const count=S.water[today]||0;
+  const grid=document.getElementById('water-cups-grid'); grid.innerHTML='';
+  for(let i=1;i<=8;i++){
+    const cup=document.createElement('div'); cup.className='wcup'+(i<=count?' full':'');
+    cup.innerHTML=`<div class="wcup-fill" style="height:${i<=count?'100':'0'}%"></div>`;
+    cup.onclick=()=>{ S.water[today]=i===count?i-1:i; save(); renderWaterCups(); document.getElementById('water-modal-count').textContent=S.water[today]; document.getElementById('home-water').textContent=S.water[today]+'/8'; if(S.water[today]>=8) showToast('💧 Hydration goal reached! +10 XP'); };
+    grid.appendChild(cup);
+  }
+  document.getElementById('water-modal-count').textContent=count;
+}
+
+// ═══════════════════════════════════
+//  SLEEP MODAL
+// ═══════════════════════════════════
+function showSleepModal(){
+  const today=todayKey();
+  document.getElementById('sleep-modal-inp').value=S.sleep[today]||'';
+  document.getElementById('sleep-modal').classList.add('open');
+}
+function saveSleepModal(){
+  const v=parseFloat(document.getElementById('sleep-modal-inp').value);
+  if(!v||v<=0){showToast('Enter valid hours');return;}
+  const today=todayKey(); S.sleep[today]=v;
+  const ci=S.checkins.find(c=>c.date===today); if(ci) ci.sleep=v;
+  save(); closeModal('sleep-modal');
+  document.getElementById('stat-sleep').textContent=v+'h';
+  document.getElementById('mpfill-sleep').style.width=Math.min(100,v/9*100)+'%';
+  showToast('😴 Sleep logged: '+v+'h');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// ═══════════════════════════════════
+//  DATA
+// ═══════════════════════════════════
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='focusflow-data.json'; a.click();
+  showToast('📤 Data exported!');
+}
+function clearAiHistory(){ if(!confirm('Clear AI chat history?')) return; chatHistory=[]; S.chatHistory=[]; save(); showToast('AI history cleared'); }
+function clearData(){ if(!confirm('Clear ALL data? Cannot undo.')) return; localStorage.removeItem('ff2_state'); location.reload(); }
+
+// ═══════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════
+function last7Days(){ return Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(6-i)); return d.toISOString().slice(0,10); }); }
+function calcStreak(){
+  let streak=0; const today=todayKey(); let d=new Date();
+  while(true){
+    const key=d.toISOString().slice(0,10);
+    if(!S.checkins.find(c=>c.date===key)){ if(key===today){d.setDate(d.getDate()-1);continue;} break; }
+    streak++; d.setDate(d.getDate()-1);
+  }
+  return streak;
+}
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+
+// ═══════════════════════════════════
+//  PARTICLE CANVAS
+// ═══════════════════════════════════
+(function(){
+  const canvas=document.getElementById('particles');
+  const ctx=canvas.getContext('2d');
+  let w,h,particles=[];
+  function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+  function mkParticle(){
+    return {x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.5+0.5,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,alpha:Math.random()*0.5+0.1};
+  }
+  resize(); window.addEventListener('resize',resize);
+  for(let i=0;i<60;i++) particles.push(mkParticle());
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>w) p.vx*=-1;
+      if(p.y<0||p.y>h) p.vy*=-1;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(157,143,255,${p.alpha})`;
+      ctx.fill();
     });
-  }, { threshold: 0.3 });
-  document.querySelectorAll('.survey-card').forEach(c => observer.observe(c));
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══════════════════════════════════
+//  ORB FLOAT ANIMATION
+// ═══════════════════════════════════
+const style=document.createElement('style');
+style.textContent=`@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-30px) scale(1.05)}66%{transform:translate(-15px,20px) scale(0.97)}}`;
+document.head.appendChild(style);
+
+// ═══════════════════════════════════
+//  INIT SPLASH TIMEOUT
+// ═══════════════════════════════════
+setTimeout(()=>{
+  if(!window._firebaseReady){
+    document.getElementById('screen-splash').style.display='none';
+    showScreen('auth');
+  }
+},4000);
 </script>
 </body>
 </html>
