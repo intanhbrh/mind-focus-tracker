@@ -18,15 +18,14 @@
   import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, serverTimestamp }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // ── PASTE YOUR FIREBASE CONFIG HERE ──
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAuMApqwPx4ESUvt2VHeZtqu7d4c_EREU0",
+  authDomain: "focusflow-fce75.firebaseapp.com",
+  projectId: "focusflow-fce75",
+  storageBucket: "focusflow-fce75.firebasestorage.app",
+  messagingSenderId: "191674228558",
+  appId: "1:191674228558:web:e88f02187eeafce04c081f"
+};
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
