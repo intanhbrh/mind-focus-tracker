@@ -1440,7 +1440,13 @@ WATER: ${S.water[today]||0}/8 cups.
 RECENT 7 CHECK-INS: ${JSON.stringify(S.checkins.slice(-7).map(c=>({date:c.date,mood:c.mood,energy:c.energy,sleep:c.sleep,blockers:c.blockers})))}`;
 
   try{
-    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system,messages:chatHistory})});
+    const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_ANTHROPIC_KEY_HERE',
+    'anthropic-version': '2023-06-01'
+  },
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system,messages:chatHistory})});
     const d=await r.json();
     const reply=d.content?.[0]?.text||"I couldn't respond right now. Please try again.";
     typing.remove(); appendMsg(reply,'ai');
